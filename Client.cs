@@ -14,8 +14,9 @@ namespace janog_reception_ui
 {
     public record class Participant
     {
+
         [JsonPropertyName("id")]
-        public int ID { get; set; }
+        public required string ID { get; set; }
 
         [JsonPropertyName("full_name")]
         public required string FullName { get; set; }
@@ -78,7 +79,7 @@ namespace janog_reception_ui
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(BaseURL + "/api/v1/participant/" + id + "/print/")
+                RequestUri = new Uri(BaseURL + "/api/v1/participants/" + id + "/accept/")
             };
 
             var response = DoRequest(request);

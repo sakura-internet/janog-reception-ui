@@ -48,15 +48,23 @@ namespace janog_reception_ui
             labelDocument.GetObject(fieldName).Text = value;
         }
 
+        private void SetDayImage(string filename)
+        {
+            labelDocument.GetObject("day_image").SetData(0, filename, 0);
+        }
+
         private void idBox_TextChanged(object sender, EventArgs e)
         {
-
+            // check ULID format by regex
+            var regex = new System.Text.RegularExpressions.Regex("^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$");
+            execButton.Enabled = regex.IsMatch(idBox.Text);
         }
 
         private void execButton_Click(object sender, EventArgs e)
         {
             Participant? participant;
-            try {
+            try
+            {
                 participant = client.AcceptParticipant(idBox.Text);
             }
             catch (Exception ex)
@@ -67,6 +75,30 @@ namespace janog_reception_ui
 
             SetLabelField("full_name", participant.FullName);
             SetLabelField("organization", participant.Organization);
+            UpdatePreview();
+        }
+
+        private void radioDay1_CheckedChanged(object sender, EventArgs e)
+        {
+            SetDayImage("day1.png");
+            UpdatePreview();
+        }
+
+        private void radioDay2_CheckedChanged(object sender, EventArgs e)
+        {
+            SetDayImage("day2.png");
+            UpdatePreview();
+        }
+
+        private void radioDay3_CheckedChanged(object sender, EventArgs e)
+        {
+            SetDayImage("day3.png");
+            UpdatePreview();
+        }
+
+        private void radioStaff_CheckedChanged(object sender, EventArgs e)
+        {
+            SetDayImage("staff.png");
             UpdatePreview();
         }
     }
