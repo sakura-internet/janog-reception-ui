@@ -1,6 +1,6 @@
 using bpac;
 using Microsoft.VisualBasic.Logging;
-using System.IO;
+using System.Net.WebSockets;
 
 namespace janog_reception_ui
 {
@@ -8,7 +8,7 @@ namespace janog_reception_ui
     {
 
         bpac.Document labelDocument;
-        Client client = new Client("https://register.janog57-dev.sakuraha.jp", "username", "password");
+        private Config _config;
 
         public ReceptionForm()
         {
@@ -21,11 +21,28 @@ namespace janog_reception_ui
             {
                 MessageBox.Show("Load label template error");
             }
+            _config = Config.LoadYAML();
+            SetConfig(_config);
         }
 
         private void ReceptionForm_Load(object sender, EventArgs e)
         {
             UpdatePreview();
+        }
+
+        private void SetConfig(Config cfg)
+        {
+            if (cfg.Environment.Environment != EnvironmentKind.Production)
+            {
+                toolStripEnvLabel.Text = "ŠJ”­ŠÂ‹«";
+                toolStripEnvLabel.BackColor = Color.Red;
+            }
+            else
+            {
+                toolStripEnvLabel.Text = "–{”ÔŠÂ‹«";
+                toolStripEnvLabel.BackColor = Color.DodgerBlue;
+            }
+            gateLabel.Text = cfg.Gate;
         }
 
         private void UpdatePreview()
@@ -62,10 +79,13 @@ namespace janog_reception_ui
 
         private void execButton_Click(object sender, EventArgs e)
         {
+            var auth = _config.Auth();
+            Client client = new Client(auth.BaseUrl, auth.Username, auth.Password);
             Participant? participant;
             try
             {
-                participant = client.AcceptParticipant(idBox.Text);
+                var response = client.AcceptParticipant(idBox.Text, _config.Gate);
+                participant = response.Participant;
             }
             catch (Exception ex)
             {
@@ -100,6 +120,21 @@ namespace janog_reception_ui
         {
             SetDayImage("staff.png");
             UpdatePreview();
+        }
+
+        private void ConfigToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            EnvConfigForm form = new EnvConfigForm();
+            form.config = _config;
+            form.ShowDialog();
+            form.config.SaveYAML();
+            SetConfig(_config);
+        }
+
+        private void toolStripStatusLabel1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

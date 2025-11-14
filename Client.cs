@@ -1,14 +1,9 @@
-﻿using Microsoft.VisualBasic.Logging;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
-using System.Threading.Tasks;
 
 namespace janog_reception_ui
 {
@@ -24,6 +19,23 @@ namespace janog_reception_ui
         [JsonPropertyName("organization")]
         public required string Organization { get; set; }
     }
+
+    public record class AcceptResponse
+    {
+        [JsonPropertyName("participant")]
+        public required Participant Participant { get; set; }
+
+        [JsonPropertyName("gate")]
+        public required string Gate { get; set; }
+    }
+
+    public record class AcceptRequest
+    {
+        [JsonPropertyName("gate")]
+        public required string Gate { get; set; }
+    }
+
+
     internal class Client
     {
         private string _username;
@@ -73,14 +85,24 @@ namespace janog_reception_ui
         }
 
 
-        public Participant AcceptParticipant(string id)
-        {
+        public AcceptResponse AcceptParticipant(string id, string gate) { 
+            // Payload
+            var payload = new AcceptRequest
+            {
+                Gate = gate
+            };
+
             // リクエストの生成
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(BaseURL + "/api/v1/participants/" + id + "/accept/")
             };
+            request.Content = new StringContent(
+                JsonSerializer.Serialize(payload, GetJsonSerializerOptions()),
+                Encoding.UTF8,
+                "application/json"
+            );
 
             var response = DoRequest(request);
 
@@ -90,12 +112,12 @@ namespace janog_reception_ui
                 Debug.Write(json);
                 try
                 {
-                    Participant? participant = JsonSerializer.Deserialize<Participant>(json, GetJsonSerializerOptions());
-                    if (participant == null)
+                    AcceptResponse? ret = JsonSerializer.Deserialize<AcceptResponse>(json, GetJsonSerializerOptions());
+                    if (ret == null)
                     {
                         throw new Exception("参加者情報の取得に失敗しました");
                     }
-                    return participant;
+                    return ret;
                 }
                 catch (JsonException e)
                 {
@@ -106,7 +128,8 @@ namespace janog_reception_ui
             else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new Exception("認証情報が間違っています");
-            }else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 throw new Exception("参加者情報が見つかりません");
             }
