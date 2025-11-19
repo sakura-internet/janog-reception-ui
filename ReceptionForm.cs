@@ -93,6 +93,7 @@ namespace janog_reception_ui
                 return;
             }
 
+            SetLabelField("program","");
             SetLabelField("full_name", participant.FullName);
             SetLabelField("organization", participant.Organization);
             UpdatePreview();
