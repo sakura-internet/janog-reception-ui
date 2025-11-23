@@ -43,6 +43,7 @@ namespace janog_reception_ui
                 toolStripEnvLabel.BackColor = Color.DodgerBlue;
             }
             gateLabel.Text = cfg.Gate;
+            printerLabel.Text = cfg.Printer;
         }
 
         private void UpdatePreview()
@@ -58,6 +59,14 @@ namespace janog_reception_ui
             }
 
             previewBox.Image = img;
+        }
+
+        private void PrintLabel()
+        {
+            labelDocument.SetPrinter(_config.Printer, false);
+            labelDocument.StartPrint("", PrintOptionConstants.bpoAutoCut);
+            labelDocument.PrintOut(1, PrintOptionConstants.bpoAutoCut);
+            labelDocument.EndPrint();
         }
 
         private void SetLabelField(string fieldName, string value)
@@ -93,7 +102,7 @@ namespace janog_reception_ui
                 return;
             }
 
-            SetLabelField("program","");
+            SetLabelField("program", "");
             SetLabelField("full_name", participant.FullName);
             SetLabelField("organization", participant.Organization);
             UpdatePreview();
@@ -136,6 +145,11 @@ namespace janog_reception_ui
         private void toolStripStatusLabel1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void printButton_Click(object sender, EventArgs e)
+        {
+            PrintLabel();
         }
     }
 }

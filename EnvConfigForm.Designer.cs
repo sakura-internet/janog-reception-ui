@@ -34,10 +34,10 @@
             groupBox2 = new GroupBox();
             textBoxDevUsername = new TextBox();
             label3 = new Label();
+            textBoxDevPassword = new TextBox();
             label2 = new Label();
             textBoxDevBaseUrl = new TextBox();
             label1 = new Label();
-            textBoxDevPassword = new TextBox();
             groupBox3 = new GroupBox();
             textBoxProdPassword = new TextBox();
             textBoxProdUsername = new TextBox();
@@ -48,6 +48,8 @@
             groupBox4 = new GroupBox();
             textBoxGate = new TextBox();
             label7 = new Label();
+            printerComboBox = new ComboBox();
+            label8 = new Label();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -59,7 +61,7 @@
             groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBox1.Controls.Add(radioEnvProduction);
             groupBox1.Controls.Add(radioEnvDevelop);
-            groupBox1.Location = new Point(12, 71);
+            groupBox1.Location = new Point(12, 179);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(536, 53);
             groupBox1.TabIndex = 0;
@@ -98,7 +100,7 @@
             groupBox2.Controls.Add(label2);
             groupBox2.Controls.Add(textBoxDevBaseUrl);
             groupBox2.Controls.Add(label1);
-            groupBox2.Location = new Point(12, 130);
+            groupBox2.Location = new Point(12, 238);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(536, 117);
             groupBox2.TabIndex = 1;
@@ -122,6 +124,15 @@
             label3.TabIndex = 6;
             label3.Text = "パスワード";
             label3.TextAlign = ContentAlignment.TopRight;
+            // 
+            // textBoxDevPassword
+            // 
+            textBoxDevPassword.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textBoxDevPassword.Location = new Point(71, 80);
+            textBoxDevPassword.Name = "textBoxDevPassword";
+            textBoxDevPassword.PasswordChar = '*';
+            textBoxDevPassword.Size = new Size(459, 23);
+            textBoxDevPassword.TabIndex = 5;
             // 
             // label2
             // 
@@ -151,15 +162,6 @@
             label1.Text = "サーバURL";
             label1.TextAlign = ContentAlignment.TopRight;
             // 
-            // textBoxDevPassword
-            // 
-            textBoxDevPassword.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textBoxDevPassword.Location = new Point(71, 80);
-            textBoxDevPassword.Name = "textBoxDevPassword";
-            textBoxDevPassword.PasswordChar = '*';
-            textBoxDevPassword.Size = new Size(459, 23);
-            textBoxDevPassword.TabIndex = 5;
-            // 
             // groupBox3
             // 
             groupBox3.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
@@ -169,7 +171,7 @@
             groupBox3.Controls.Add(label5);
             groupBox3.Controls.Add(textBoxProdBaseUrl);
             groupBox3.Controls.Add(label6);
-            groupBox3.Location = new Point(12, 253);
+            groupBox3.Location = new Point(12, 361);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new Size(536, 117);
             groupBox3.TabIndex = 7;
@@ -233,11 +235,13 @@
             // 
             // groupBox4
             // 
+            groupBox4.Controls.Add(label8);
+            groupBox4.Controls.Add(printerComboBox);
             groupBox4.Controls.Add(textBoxGate);
             groupBox4.Controls.Add(label7);
             groupBox4.Location = new Point(12, 12);
             groupBox4.Name = "groupBox4";
-            groupBox4.Size = new Size(536, 53);
+            groupBox4.Size = new Size(536, 137);
             groupBox4.TabIndex = 8;
             groupBox4.TabStop = false;
             groupBox4.Text = "基本設定";
@@ -260,11 +264,30 @@
             label7.Text = "ゲート";
             label7.TextAlign = ContentAlignment.TopRight;
             // 
+            // printerComboBox
+            // 
+            printerComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            printerComboBox.FormattingEnabled = true;
+            printerComboBox.Location = new Point(71, 48);
+            printerComboBox.Name = "printerComboBox";
+            printerComboBox.Size = new Size(459, 23);
+            printerComboBox.TabIndex = 5;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(23, 51);
+            label8.Name = "label8";
+            label8.Size = new Size(42, 15);
+            label8.TabIndex = 6;
+            label8.Text = "プリンタ";
+            label8.TextAlign = ContentAlignment.TopRight;
+            // 
             // EnvConfigForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(560, 381);
+            ClientSize = new Size(560, 497);
             Controls.Add(groupBox4);
             Controls.Add(groupBox3);
             Controls.Add(groupBox2);
@@ -308,5 +331,7 @@
         private GroupBox groupBox4;
         private TextBox textBoxGate;
         private Label label7;
+        private Label label8;
+        private ComboBox printerComboBox;
     }
 }

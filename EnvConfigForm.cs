@@ -1,9 +1,12 @@
-﻿using System;
+﻿using bpac;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -12,7 +15,10 @@ namespace janog_reception_ui
 {
     public partial class EnvConfigForm : Form
     {
+
+        bpac.Document labelDocument;
         internal Config config;
+
         public EnvConfigForm()
         {
             InitializeComponent();
@@ -24,7 +30,22 @@ namespace janog_reception_ui
         }
 
         private void EnvConfigForm_Load(object sender, EventArgs e)
-        {
+        { 
+            labelDocument = new bpac.Document();
+            var printers = labelDocument.Printer.GetInstalledPrinters();
+            printerComboBox.Items.Clear();
+
+            // プリンタ一覧を取得してコンボボックスへ設定s
+            foreach (string printer in PrinterSettings.InstalledPrinters)
+            {
+                if (labelDocument.Printer.IsPrinterSupported(printer)) {
+                    printerComboBox.Items.Add(printer);
+                    if (printer == config.Printer)
+                    {
+                        printerComboBox.SelectedItem = printer;
+                    }
+                }
+            }
         }
 
         private void EnvConfigForm_Shown(object sender, EventArgs e)
@@ -41,6 +62,7 @@ namespace janog_reception_ui
             }
 
             textBoxGate.Text = config.Gate;
+            printerComboBox.SelectedItem = config.Printer;
             textBoxDevBaseUrl.Text = config.Environment.Develop.BaseUrl;
             textBoxDevUsername.Text = config.Environment.Develop.Username;
             textBoxDevPassword.Text = config.Environment.Develop.Password;
@@ -60,6 +82,7 @@ namespace janog_reception_ui
                 config.Environment.Environment = EnvironmentKind.Develop;
             }
             config.Gate = textBoxGate.Text;
+            config.Printer = printerComboBox.SelectedItem.ToString();
             config.Environment.Develop.BaseUrl = textBoxDevBaseUrl.Text;
             config.Environment.Develop.Username = textBoxDevUsername.Text;
             config.Environment.Develop.Password = textBoxDevPassword.Text;

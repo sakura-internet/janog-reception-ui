@@ -64,6 +64,7 @@ namespace janog_reception_ui
     {
         public required EnvironmentConfig Environment { get; set; }
         public required string Gate {  get; set; }
+        public required string Printer { get; set; }
 
         // 実行ファイルのディレクトリを返す関数
         private static string GetAppDir()
@@ -84,6 +85,7 @@ namespace janog_reception_ui
                 Config cfg = new Config
                 {
                     Gate = "default",
+                    Printer = "",
                     Environment = new EnvironmentConfig
                     {
                         Environment = EnvironmentKind.Develop,

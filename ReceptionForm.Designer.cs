@@ -30,6 +30,7 @@
         {
             components = new System.ComponentModel.Container();
             groupBox1 = new GroupBox();
+            printButton = new Button();
             previewBox = new PictureBox();
             idBox = new TextBox();
             groupBox2 = new GroupBox();
@@ -42,9 +43,10 @@
             contextMenuStrip1 = new ContextMenuStrip(components);
             ConfigToolStripMenuItem = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
-            toolStripEnvLabel = new ToolStripStatusLabel();
             gateLabel = new ToolStripStatusLabel();
+            printerLabel = new ToolStripStatusLabel();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
+            toolStripEnvLabel = new ToolStripStatusLabel();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             groupBox2.SuspendLayout();
@@ -54,6 +56,7 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(printButton);
             groupBox1.Controls.Add(previewBox);
             groupBox1.Location = new Point(12, 12);
             groupBox1.Name = "groupBox1";
@@ -62,12 +65,23 @@
             groupBox1.TabStop = false;
             groupBox1.Text = "印刷プレビュー";
             // 
+            // printButton
+            // 
+            printButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            printButton.Location = new Point(291, 209);
+            printButton.Name = "printButton";
+            printButton.Size = new Size(75, 23);
+            printButton.TabIndex = 1;
+            printButton.Text = "再印刷";
+            printButton.UseVisualStyleBackColor = true;
+            printButton.Click += printButton_Click;
+            // 
             // previewBox
             // 
             previewBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             previewBox.Location = new Point(6, 22);
             previewBox.Name = "previewBox";
-            previewBox.Size = new Size(360, 210);
+            previewBox.Size = new Size(360, 181);
             previewBox.SizeMode = PictureBoxSizeMode.Zoom;
             previewBox.TabIndex = 0;
             previewBox.TabStop = false;
@@ -183,18 +197,12 @@
             // 
             // statusStrip1
             // 
-            statusStrip1.Items.AddRange(new ToolStripItem[] { gateLabel, toolStripStatusLabel1, toolStripEnvLabel });
-            statusStrip1.Location = new Point(0, 257);
+            statusStrip1.Items.AddRange(new ToolStripItem[] { gateLabel, printerLabel, toolStripStatusLabel1, toolStripEnvLabel });
+            statusStrip1.Location = new Point(0, 258);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(896, 22);
             statusStrip1.TabIndex = 3;
             statusStrip1.Text = "statusStrip1";
-            // 
-            // toolStripEnvLabel
-            // 
-            toolStripEnvLabel.Name = "toolStripEnvLabel";
-            toolStripEnvLabel.Size = new Size(99, 17);
-            toolStripEnvLabel.Text = "toolStripEnvLabel";
             // 
             // gateLabel
             // 
@@ -202,18 +210,30 @@
             gateLabel.Size = new Size(58, 17);
             gateLabel.Text = "gateLabel";
             // 
+            // printerLabel
+            // 
+            printerLabel.Name = "printerLabel";
+            printerLabel.Size = new Size(70, 17);
+            printerLabel.Text = "printerLabel";
+            // 
             // toolStripStatusLabel1
             // 
             toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            toolStripStatusLabel1.Size = new Size(724, 17);
+            toolStripStatusLabel1.Size = new Size(623, 17);
             toolStripStatusLabel1.Spring = true;
             toolStripStatusLabel1.Click += toolStripStatusLabel1_Click;
+            // 
+            // toolStripEnvLabel
+            // 
+            toolStripEnvLabel.Name = "toolStripEnvLabel";
+            toolStripEnvLabel.Size = new Size(99, 17);
+            toolStripEnvLabel.Text = "toolStripEnvLabel";
             // 
             // ReceptionForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(896, 279);
+            ClientSize = new Size(896, 280);
             ContextMenuStrip = contextMenuStrip1;
             Controls.Add(statusStrip1);
             Controls.Add(groupBox2);
@@ -250,5 +270,7 @@
         private ToolStripStatusLabel toolStripEnvLabel;
         private ToolStripStatusLabel gateLabel;
         private ToolStripStatusLabel toolStripStatusLabel1;
+        private Button printButton;
+        private ToolStripStatusLabel printerLabel;
     }
 }
