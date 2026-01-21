@@ -46,10 +46,12 @@
             textBoxProdBaseUrl = new TextBox();
             label6 = new Label();
             groupBox4 = new GroupBox();
+            label8 = new Label();
+            printerComboBox = new ComboBox();
             textBoxGate = new TextBox();
             label7 = new Label();
-            printerComboBox = new ComboBox();
-            label8 = new Label();
+            label9 = new Label();
+            readerComboBox = new ComboBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -235,6 +237,8 @@
             // 
             // groupBox4
             // 
+            groupBox4.Controls.Add(readerComboBox);
+            groupBox4.Controls.Add(label9);
             groupBox4.Controls.Add(label8);
             groupBox4.Controls.Add(printerComboBox);
             groupBox4.Controls.Add(textBoxGate);
@@ -245,6 +249,25 @@
             groupBox4.TabIndex = 8;
             groupBox4.TabStop = false;
             groupBox4.Text = "基本設定";
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(23, 51);
+            label8.Name = "label8";
+            label8.Size = new Size(42, 15);
+            label8.TabIndex = 6;
+            label8.Text = "プリンタ";
+            label8.TextAlign = ContentAlignment.TopRight;
+            // 
+            // printerComboBox
+            // 
+            printerComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            printerComboBox.FormattingEnabled = true;
+            printerComboBox.Location = new Point(71, 48);
+            printerComboBox.Name = "printerComboBox";
+            printerComboBox.Size = new Size(459, 23);
+            printerComboBox.TabIndex = 5;
             // 
             // textBoxGate
             // 
@@ -264,24 +287,25 @@
             label7.Text = "ゲート";
             label7.TextAlign = ContentAlignment.TopRight;
             // 
-            // printerComboBox
+            // label9
             // 
-            printerComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            printerComboBox.FormattingEnabled = true;
-            printerComboBox.Location = new Point(71, 48);
-            printerComboBox.Name = "printerComboBox";
-            printerComboBox.Size = new Size(459, 23);
-            printerComboBox.TabIndex = 5;
+            label9.AutoSize = true;
+            label9.Location = new Point(25, 80);
+            label9.Name = "label9";
+            label9.Size = new Size(40, 15);
+            label9.TabIndex = 7;
+            label9.Text = "リーダー";
+            label9.TextAlign = ContentAlignment.TopRight;
+            label9.Click += label9_Click;
             // 
-            // label8
+            // readerComboBox
             // 
-            label8.AutoSize = true;
-            label8.Location = new Point(23, 51);
-            label8.Name = "label8";
-            label8.Size = new Size(42, 15);
-            label8.TabIndex = 6;
-            label8.Text = "プリンタ";
-            label8.TextAlign = ContentAlignment.TopRight;
+            readerComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            readerComboBox.FormattingEnabled = true;
+            readerComboBox.Location = new Point(71, 77);
+            readerComboBox.Name = "readerComboBox";
+            readerComboBox.Size = new Size(459, 23);
+            readerComboBox.TabIndex = 8;
             // 
             // EnvConfigForm
             // 
@@ -333,5 +357,7 @@
         private Label label7;
         private Label label8;
         private ComboBox printerComboBox;
+        private Label label9;
+        private ComboBox readerComboBox;
     }
 }

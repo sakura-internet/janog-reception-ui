@@ -45,8 +45,10 @@
             statusStrip1 = new StatusStrip();
             gateLabel = new ToolStripStatusLabel();
             printerLabel = new ToolStripStatusLabel();
+            readerLabel = new ToolStripStatusLabel();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             toolStripEnvLabel = new ToolStripStatusLabel();
+            timer1 = new System.Windows.Forms.Timer(components);
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             groupBox2.SuspendLayout();
@@ -197,7 +199,7 @@
             // 
             // statusStrip1
             // 
-            statusStrip1.Items.AddRange(new ToolStripItem[] { gateLabel, printerLabel, toolStripStatusLabel1, toolStripEnvLabel });
+            statusStrip1.Items.AddRange(new ToolStripItem[] { gateLabel, printerLabel, readerLabel, toolStripStatusLabel1, toolStripEnvLabel });
             statusStrip1.Location = new Point(0, 258);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(896, 22);
@@ -216,10 +218,16 @@
             printerLabel.Size = new Size(70, 17);
             printerLabel.Text = "printerLabel";
             // 
+            // readerLabel
+            // 
+            readerLabel.Name = "readerLabel";
+            readerLabel.Size = new Size(68, 17);
+            readerLabel.Text = "readerLabel";
+            // 
             // toolStripStatusLabel1
             // 
             toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            toolStripStatusLabel1.Size = new Size(623, 17);
+            toolStripStatusLabel1.Size = new Size(586, 17);
             toolStripStatusLabel1.Spring = true;
             toolStripStatusLabel1.Click += toolStripStatusLabel1_Click;
             // 
@@ -228,6 +236,11 @@
             toolStripEnvLabel.Name = "toolStripEnvLabel";
             toolStripEnvLabel.Size = new Size(99, 17);
             toolStripEnvLabel.Text = "toolStripEnvLabel";
+            // 
+            // timer1
+            // 
+            timer1.Interval = 1000;
+            timer1.Tick += timer1_Tick;
             // 
             // ReceptionForm
             // 
@@ -272,5 +285,7 @@
         private ToolStripStatusLabel toolStripStatusLabel1;
         private Button printButton;
         private ToolStripStatusLabel printerLabel;
+        private ToolStripStatusLabel readerLabel;
+        private System.Windows.Forms.Timer timer1;
     }
 }

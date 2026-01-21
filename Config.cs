@@ -2,6 +2,8 @@
 using System.Runtime.Serialization;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using System.Collections.Generic;
+using System.Management;
 
 namespace janog_reception_ui
 {
@@ -59,12 +61,19 @@ namespace janog_reception_ui
         public required AuthConfig Production { get; set; }
 
     }
+
+    internal class Reader
+    {
+        public required string Port { get; set; }
+        public required string Serial { get; set; }
+    }
     
     internal class Config
     {
         public required EnvironmentConfig Environment { get; set; }
         public required string Gate {  get; set; }
         public required string Printer { get; set; }
+        public required Reader Reader { get; set; }
 
         // 実行ファイルのディレクトリを返す関数
         private static string GetAppDir()
@@ -86,6 +95,11 @@ namespace janog_reception_ui
                 {
                     Gate = "default",
                     Printer = "",
+                    Reader = new Reader
+                    {
+                      Port = "",  
+                      Serial = "",
+                    },
                     Environment = new EnvironmentConfig
                     {
                         Environment = EnvironmentKind.Develop,
