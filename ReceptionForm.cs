@@ -13,6 +13,7 @@ namespace janog_reception_ui
         bpac.Document labelDocument;
         private Config _config;
         private SerialPort? _serialPort;
+        private string _currentImage = "day1.png";
 
         public ReceptionForm()
         {
@@ -135,34 +136,44 @@ namespace janog_reception_ui
                 return;
             }
 
+            if (participant.Type == "staff" || participant.Type == "host")
+            {
+                SetDayImage("staff.png");
+            }
+
             SetLabelField("program", participant.Program);
             SetLabelField("full_name", participant.FullName);
             SetLabelField("organization", participant.Organization);
             UpdatePreview();
             PrintLabel();
+            SetDayImage(_currentImage);
         }
 
         private void radioDay1_CheckedChanged(object sender, EventArgs e)
         {
-            SetDayImage("day1.png");
+            _currentImage = "day1.png";
+            SetDayImage(_currentImage);
             UpdatePreview();
         }
 
         private void radioDay2_CheckedChanged(object sender, EventArgs e)
         {
-            SetDayImage("day2.png");
+            _currentImage = "day2.png";
+            SetDayImage(_currentImage);
             UpdatePreview();
         }
 
         private void radioDay3_CheckedChanged(object sender, EventArgs e)
         {
-            SetDayImage("day3.png");
+            _currentImage = "day3.png";
+            SetDayImage(_currentImage);
             UpdatePreview();
         }
 
         private void radioStaff_CheckedChanged(object sender, EventArgs e)
         {
-            SetDayImage("staff.png");
+            _currentImage = "staff.png";
+            SetDayImage(_currentImage);
             UpdatePreview();
         }
 
