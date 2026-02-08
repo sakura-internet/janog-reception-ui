@@ -18,6 +18,13 @@ namespace janog_reception_ui
 
         [JsonPropertyName("organization")]
         public required string Organization { get; set; }
+
+        [JsonPropertyName("type")]
+        public required string Type { get; set; }
+
+        [JsonPropertyName("program")]
+        public required string Program { get; set; }
+
     }
 
     public record class AcceptResponse
