@@ -2,6 +2,7 @@ using bpac;
 using Microsoft.VisualBasic.Logging;
 using System.IO.Ports;
 using System.Net.WebSockets;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -130,7 +131,7 @@ namespace janog_reception_ui
             Participant? participant;
             try
             {
-                var response = client.AcceptParticipant(idBox.Text, _config.Gate);
+                var response = client.AcceptParticipant(idBox.Text, _config.Gate, mediaBox.Text);
                 participant = response.Participant;
             }
             catch (Exception ex)
@@ -239,12 +240,17 @@ namespace janog_reception_ui
                     var ulid = TryExtractUlid(line);
                     if (ulid != "")
                     {
+
+                        int q = line.IndexOf('?');
+                        string beforeQuery = q >= 0 ? line.Substring(0, q) : line;
+
                         // UIスレッドに処理を渡す
                         BeginInvoke(new Action(() =>
                         {
                             if (idBox.Text != ulid)
                             {
                                 idBox.Text = ulid;
+                                mediaBox.Text = beforeQuery;
                                 execute();
                             }
                         }));
@@ -271,6 +277,11 @@ namespace janog_reception_ui
                     readerLabel.Text = _config.Reader.Port + " (エラー)";
                 }
             }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+            System.Media.SystemSounds.Beep.Play();
         }
     }
 }

@@ -47,9 +47,11 @@
             printerLabel = new ToolStripStatusLabel();
             readerLabel = new ToolStripStatusLabel();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
+            errorLabel = new ToolStripStatusLabel();
             toolStripEnvLabel = new ToolStripStatusLabel();
             timer1 = new System.Windows.Forms.Timer(components);
-            errorLabel = new ToolStripStatusLabel();
+            label2 = new Label();
+            mediaBox = new TextBox();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             groupBox2.SuspendLayout();
@@ -93,15 +95,17 @@
             // 
             idBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             idBox.Font = new Font("Yu Gothic UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 128);
-            idBox.Location = new Point(49, 19);
+            idBox.Location = new Point(93, 19);
             idBox.Name = "idBox";
-            idBox.Size = new Size(439, 39);
+            idBox.Size = new Size(395, 39);
             idBox.TabIndex = 1;
             idBox.TextChanged += idBox_TextChanged;
             // 
             // groupBox2
             // 
             groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox2.Controls.Add(label2);
+            groupBox2.Controls.Add(mediaBox);
             groupBox2.Controls.Add(radioStaff);
             groupBox2.Controls.Add(radioDay3);
             groupBox2.Controls.Add(radioDay2);
@@ -119,7 +123,7 @@
             // radioStaff
             // 
             radioStaff.AutoSize = true;
-            radioStaff.Location = new Point(223, 80);
+            radioStaff.Location = new Point(220, 124);
             radioStaff.Name = "radioStaff";
             radioStaff.Size = new Size(48, 19);
             radioStaff.TabIndex = 6;
@@ -130,7 +134,7 @@
             // radioDay3
             // 
             radioDay3.AutoSize = true;
-            radioDay3.Location = new Point(166, 80);
+            radioDay3.Location = new Point(163, 124);
             radioDay3.Name = "radioDay3";
             radioDay3.Size = new Size(51, 19);
             radioDay3.TabIndex = 5;
@@ -141,7 +145,7 @@
             // radioDay2
             // 
             radioDay2.AutoSize = true;
-            radioDay2.Location = new Point(109, 80);
+            radioDay2.Location = new Point(106, 124);
             radioDay2.Name = "radioDay2";
             radioDay2.Size = new Size(51, 19);
             radioDay2.TabIndex = 4;
@@ -153,7 +157,7 @@
             // 
             radioDay1.AutoSize = true;
             radioDay1.Checked = true;
-            radioDay1.Location = new Point(52, 80);
+            radioDay1.Location = new Point(49, 124);
             radioDay1.Name = "radioDay1";
             radioDay1.Size = new Size(51, 19);
             radioDay1.TabIndex = 3;
@@ -184,6 +188,7 @@
             label1.Size = new Size(37, 32);
             label1.TabIndex = 2;
             label1.Text = "ID";
+            label1.Click += label1_Click;
             // 
             // contextMenuStrip1
             // 
@@ -232,6 +237,12 @@
             toolStripStatusLabel1.Spring = true;
             toolStripStatusLabel1.Click += toolStripStatusLabel1_Click;
             // 
+            // errorLabel
+            // 
+            errorLabel.Name = "errorLabel";
+            errorLabel.Size = new Size(60, 17);
+            errorLabel.Text = "errorLabel";
+            // 
             // toolStripEnvLabel
             // 
             toolStripEnvLabel.Name = "toolStripEnvLabel";
@@ -243,11 +254,24 @@
             timer1.Interval = 1000;
             timer1.Tick += timer1_Tick;
             // 
-            // errorLabel
+            // label2
             // 
-            errorLabel.Name = "errorLabel";
-            errorLabel.Size = new Size(60, 17);
-            errorLabel.Text = "errorLabel";
+            label2.AutoSize = true;
+            label2.Font = new Font("Yu Gothic UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 128);
+            label2.Location = new Point(6, 67);
+            label2.Name = "label2";
+            label2.Size = new Size(81, 32);
+            label2.TabIndex = 8;
+            label2.Text = "Media";
+            // 
+            // mediaBox
+            // 
+            mediaBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            mediaBox.Font = new Font("Yu Gothic UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 128);
+            mediaBox.Location = new Point(93, 64);
+            mediaBox.Name = "mediaBox";
+            mediaBox.Size = new Size(395, 39);
+            mediaBox.TabIndex = 7;
             // 
             // ReceptionForm
             // 
@@ -295,5 +319,7 @@
         private ToolStripStatusLabel readerLabel;
         private System.Windows.Forms.Timer timer1;
         private ToolStripStatusLabel errorLabel;
+        private Label label2;
+        private TextBox mediaBox;
     }
 }

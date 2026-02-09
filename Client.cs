@@ -40,6 +40,8 @@ namespace janog_reception_ui
     {
         [JsonPropertyName("gate")]
         public required string Gate { get; set; }
+        [JsonPropertyName("method")]
+        public required string Method { get; set; }
     }
 
 
@@ -92,11 +94,12 @@ namespace janog_reception_ui
         }
 
 
-        public AcceptResponse AcceptParticipant(string id, string gate) { 
+        public AcceptResponse AcceptParticipant(string id, string gate, string method) { 
             // Payload
             var payload = new AcceptRequest
             {
-                Gate = gate
+                Gate = gate,
+                Method = method,
             };
 
             // リクエストの生成
