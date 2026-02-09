@@ -49,6 +49,7 @@
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             toolStripEnvLabel = new ToolStripStatusLabel();
             timer1 = new System.Windows.Forms.Timer(components);
+            errorLabel = new ToolStripStatusLabel();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             groupBox2.SuspendLayout();
@@ -199,7 +200,7 @@
             // 
             // statusStrip1
             // 
-            statusStrip1.Items.AddRange(new ToolStripItem[] { gateLabel, printerLabel, readerLabel, toolStripStatusLabel1, toolStripEnvLabel });
+            statusStrip1.Items.AddRange(new ToolStripItem[] { gateLabel, printerLabel, readerLabel, toolStripStatusLabel1, errorLabel, toolStripEnvLabel });
             statusStrip1.Location = new Point(0, 258);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(896, 22);
@@ -227,7 +228,7 @@
             // toolStripStatusLabel1
             // 
             toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            toolStripStatusLabel1.Size = new Size(586, 17);
+            toolStripStatusLabel1.Size = new Size(526, 17);
             toolStripStatusLabel1.Spring = true;
             toolStripStatusLabel1.Click += toolStripStatusLabel1_Click;
             // 
@@ -241,6 +242,12 @@
             // 
             timer1.Interval = 1000;
             timer1.Tick += timer1_Tick;
+            // 
+            // errorLabel
+            // 
+            errorLabel.Name = "errorLabel";
+            errorLabel.Size = new Size(60, 17);
+            errorLabel.Text = "errorLabel";
             // 
             // ReceptionForm
             // 
@@ -287,5 +294,6 @@
         private ToolStripStatusLabel printerLabel;
         private ToolStripStatusLabel readerLabel;
         private System.Windows.Forms.Timer timer1;
+        private ToolStripStatusLabel errorLabel;
     }
 }

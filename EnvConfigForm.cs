@@ -19,12 +19,6 @@ using System.Windows.Forms;
 
 namespace janog_reception_ui
 {
-    class SerialPortItem
-    {
-        public string Caption { get; set; }
-        public string Port { get; set; }
-    }
-
     public partial class EnvConfigForm : Form
     {
 
@@ -173,4 +167,10 @@ namespace janog_reception_ui
                 .ToArray();
         }
     }
+    class SerialPortItem
+    {
+        public string Caption { get; set; }
+        public string Port { get; set; }
+    }
+
 }

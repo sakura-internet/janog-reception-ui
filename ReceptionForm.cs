@@ -23,6 +23,8 @@ namespace janog_reception_ui
             _serialPort.BaudRate = 115200;
             _serialPort.DataReceived += SerialPort_DataReceived;
 
+            errorLabel.Text = "";
+
             // Load Label Template
             string? exeDirPath = Path.GetDirectoryName(Application.ExecutablePath);
             labelDocument = new bpac.Document();
@@ -122,6 +124,7 @@ namespace janog_reception_ui
         private void execute()
         {
 
+            errorLabel.Text = "";
             var auth = _config.Auth();
             Client client = new Client(auth.BaseUrl, auth.Username, auth.Password);
             Participant? participant;
@@ -132,7 +135,8 @@ namespace janog_reception_ui
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "ÉGÉâÅ[", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Media.SystemSounds.Beep.Play();
+                errorLabel.Text = ex.Message;
                 return;
             }
 
