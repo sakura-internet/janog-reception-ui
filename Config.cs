@@ -103,8 +103,8 @@ namespace janog_reception_ui
                     Environment = new EnvironmentConfig
                     {
                         Environment = EnvironmentKind.Develop,
-                        Develop = new AuthConfig { BaseUrl = "https://register.janog57-dev.sakuraha.jp", Username = "username", Password = "password" },
-                        Production = new AuthConfig { BaseUrl = "https://register.janog57.sakuraha.jp", Username = "username", Password = "password" },
+                        Develop = new AuthConfig { BaseUrl = "https://register.janog57-dev.example.com", Username = "username", Password = "password" },
+                        Production = new AuthConfig { BaseUrl = "https://register.janog57.example.com", Username = "username", Password = "password" },
                     },
 
                 };
