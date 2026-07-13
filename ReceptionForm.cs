@@ -15,6 +15,7 @@ namespace janog_reception_ui
         private Config _config;
         private SerialPort? _serialPort;
         private string _currentImage = "day1.png";
+        private EnvConfigForm? _activeEnvConfigForm;
 
         public ReceptionForm()
         {
@@ -203,10 +204,21 @@ namespace janog_reception_ui
 
         private void ConfigToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             EnvConfigForm form = new EnvConfigForm();
             form.config = _config;
-            form.ShowDialog();
+            _activeEnvConfigForm = form;
+            try
+            {
+                form.ShowDialog(this);
+            }
+            finally
+            {
+                if (ReferenceEquals(_activeEnvConfigForm, form))
+                {
+                    _activeEnvConfigForm = null;
+                }
+                form.Dispose();
+            }
             form.config.SaveYAML();
             SetConfig(_config);
         }
@@ -254,6 +266,20 @@ namespace janog_reception_ui
 
                 if (line != "")
                 {
+                    var configForm = _activeEnvConfigForm;
+                    if (configForm != null)
+                    {
+                        // 設定画面が開いている間は、参加者受付QRではなく設定用QRとして扱う。
+                        BeginInvoke(new Action(() =>
+                        {
+                            if (ReferenceEquals(_activeEnvConfigForm, configForm) && !configForm.IsDisposed)
+                            {
+                                configForm.HandleQrScan(line);
+                            }
+                        }));
+                        continue;
+                    }
+
                     // "passbook?p=01KCJMZ8EF29PQ70ZY3RV42H19"
                     Console.WriteLine(line);
                     var ulid = TryExtractUlid(line);

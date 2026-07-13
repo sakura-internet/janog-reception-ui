@@ -13,6 +13,7 @@ using System.Management;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -124,6 +125,65 @@ namespace janog_reception_ui
 
         }
 
+        public void HandleQrScan(string rawValue)
+        {
+            if (!TryParseQrCredentials(rawValue, out var credentials))
+            {
+                return;
+            }
+
+            using var dialog = new QrImportConfirmDialog();
+            var result = dialog.ShowDialog(this);
+
+            if (result == DialogResult.Yes)
+            {
+                textBoxDevBaseUrl.Text = credentials.Url;
+                textBoxDevUsername.Text = credentials.Username;
+                textBoxDevPassword.Text = credentials.Password;
+            }
+            else if (result == DialogResult.No)
+            {
+                textBoxProdBaseUrl.Text = credentials.Url;
+                textBoxProdUsername.Text = credentials.Username;
+                textBoxProdPassword.Text = credentials.Password;
+            }
+        }
+
+        private static bool TryParseQrCredentials(string rawValue, out QrCredentials credentials)
+        {
+            credentials = default;
+
+            try
+            {
+                using var document = JsonDocument.Parse(rawValue);
+                var root = document.RootElement;
+                if (root.ValueKind != JsonValueKind.Object ||
+                    !root.TryGetProperty("url", out var url) || url.ValueKind != JsonValueKind.String ||
+                    !root.TryGetProperty("user", out var username) || username.ValueKind != JsonValueKind.String ||
+                    !root.TryGetProperty("pass", out var password) || password.ValueKind != JsonValueKind.String)
+                {
+                    return false;
+                }
+
+                var urlValue = url.GetString();
+                var usernameValue = username.GetString();
+                var passwordValue = password.GetString();
+                if (string.IsNullOrWhiteSpace(urlValue) ||
+                    string.IsNullOrWhiteSpace(usernameValue) ||
+                    string.IsNullOrWhiteSpace(passwordValue))
+                {
+                    return false;
+                }
+
+                credentials = new QrCredentials(urlValue, usernameValue, passwordValue);
+                return true;
+            }
+            catch (JsonException)
+            {
+                return false;
+            }
+        }
+
         static Dictionary<string, string> GetComCaptionMapByPnP()
         {
             var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -171,6 +231,55 @@ namespace janog_reception_ui
     {
         public string Caption { get; set; }
         public string Port { get; set; }
+    }
+
+    internal readonly record struct QrCredentials(string Url, string Username, string Password);
+
+    internal sealed class QrImportConfirmDialog : Form
+    {
+        public QrImportConfirmDialog()
+        {
+            Text = "設定値の入力";
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            StartPosition = FormStartPosition.CenterParent;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            ShowInTaskbar = false;
+            ClientSize = new Size(390, 120);
+
+            var message = new Label
+            {
+                AutoSize = true,
+                Location = new Point(20, 20),
+                Text = "設定値を入力しますか"
+            };
+
+            var developButton = new Button
+            {
+                DialogResult = DialogResult.Yes,
+                Location = new Point(20, 65),
+                Size = new Size(105, 30),
+                Text = "開発環境"
+            };
+            var productionButton = new Button
+            {
+                DialogResult = DialogResult.No,
+                Location = new Point(142, 65),
+                Size = new Size(105, 30),
+                Text = "本番環境"
+            };
+            var cancelButton = new Button
+            {
+                DialogResult = DialogResult.Cancel,
+                Location = new Point(264, 65),
+                Size = new Size(105, 30),
+                Text = "キャンセル"
+            };
+
+            Controls.AddRange(new Control[] { message, developButton, productionButton, cancelButton });
+            AcceptButton = developButton;
+            CancelButton = cancelButton;
+        }
     }
 
 }
