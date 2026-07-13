@@ -25,6 +25,9 @@ namespace janog_reception_ui
         [JsonPropertyName("program")]
         public required string Program { get; set; }
 
+        [JsonPropertyName("accept_count")]
+        public int AcceptCount { get; set; }
+
     }
 
     public record class AcceptResponse

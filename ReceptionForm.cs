@@ -100,6 +100,21 @@ namespace janog_reception_ui
             labelDocument.EndPrint();
         }
 
+        private void PrintSpeakersLabel()
+        {
+            string? exeDirPath = Path.GetDirectoryName(Application.ExecutablePath);
+            var speakersLabelDocument = new bpac.Document();
+            if (!speakersLabelDocument.Open((exeDirPath ?? string.Empty) + "\\" + "label-speakers.lbx"))
+            {
+                throw new Exception("Load speakers label template error");
+            }
+
+            speakersLabelDocument.SetPrinter(_config.Printer, false);
+            speakersLabelDocument.StartPrint("", PrintOptionConstants.bpoAutoCut);
+            speakersLabelDocument.PrintOut(1, PrintOptionConstants.bpoAutoCut);
+            speakersLabelDocument.EndPrint();
+            speakersLabelDocument.Close();
+        }
         private void SetLabelField(string fieldName, string value)
         {
             labelDocument.GetObject(fieldName).Text = value;
@@ -150,6 +165,10 @@ namespace janog_reception_ui
             SetLabelField("full_name", participant.FullName);
             SetLabelField("organization", participant.Organization);
             UpdatePreview();
+            if (participant.AcceptCount == 1)
+            {
+                PrintSpeakersLabel();
+            }
             PrintLabel();
             SetDayImage(_currentImage);
         }
