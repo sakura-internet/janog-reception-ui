@@ -14,6 +14,7 @@ namespace janog_reception_ui
         bpac.Document labelDocument;
         private Config _config;
         private SerialPort? _serialPort;
+        private readonly System.Media.SoundPlayer _speakersVoicePlayer;
         private string _currentImage = "day1.png";
         private EnvConfigForm? _activeEnvConfigForm;
 
@@ -29,6 +30,8 @@ namespace janog_reception_ui
 
             // Load Label Template
             string? exeDirPath = Path.GetDirectoryName(Application.ExecutablePath);
+            _speakersVoicePlayer = new System.Media.SoundPlayer(
+                Path.Combine(exeDirPath ?? string.Empty, "voice-speakers.wav"));
             labelDocument = new bpac.Document();
             if (!labelDocument.Open((exeDirPath ?? string.Empty) + "\\" + "label.lbx"))
             {
@@ -168,6 +171,10 @@ namespace janog_reception_ui
             UpdatePreview();
             if (participant.AcceptCount == 1)
             {
+                if (_config.AudioEnabled)
+                {
+                    _speakersVoicePlayer.Play();
+                }
                 PrintSpeakersLabel();
             }
             PrintLabel();

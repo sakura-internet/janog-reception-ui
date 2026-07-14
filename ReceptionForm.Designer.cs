@@ -34,6 +34,9 @@
             previewBox = new PictureBox();
             idBox = new TextBox();
             groupBox2 = new GroupBox();
+            radioHost = new RadioButton();
+            label2 = new Label();
+            mediaBox = new TextBox();
             radioStaff = new RadioButton();
             radioDay3 = new RadioButton();
             radioDay2 = new RadioButton();
@@ -50,8 +53,6 @@
             errorLabel = new ToolStripStatusLabel();
             toolStripEnvLabel = new ToolStripStatusLabel();
             timer1 = new System.Windows.Forms.Timer(components);
-            label2 = new Label();
-            mediaBox = new TextBox();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
             groupBox2.SuspendLayout();
@@ -63,9 +64,11 @@
             // 
             groupBox1.Controls.Add(printButton);
             groupBox1.Controls.Add(previewBox);
-            groupBox1.Location = new Point(12, 12);
+            groupBox1.Location = new Point(17, 20);
+            groupBox1.Margin = new Padding(4, 5, 4, 5);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(372, 238);
+            groupBox1.Padding = new Padding(4, 5, 4, 5);
+            groupBox1.Size = new Size(531, 397);
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             groupBox1.Text = "印刷プレビュー";
@@ -73,9 +76,10 @@
             // printButton
             // 
             printButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            printButton.Location = new Point(291, 209);
+            printButton.Location = new Point(416, 348);
+            printButton.Margin = new Padding(4, 5, 4, 5);
             printButton.Name = "printButton";
-            printButton.Size = new Size(75, 23);
+            printButton.Size = new Size(107, 38);
             printButton.TabIndex = 1;
             printButton.Text = "再印刷";
             printButton.UseVisualStyleBackColor = true;
@@ -84,9 +88,10 @@
             // previewBox
             // 
             previewBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            previewBox.Location = new Point(6, 22);
+            previewBox.Location = new Point(9, 37);
+            previewBox.Margin = new Padding(4, 5, 4, 5);
             previewBox.Name = "previewBox";
-            previewBox.Size = new Size(360, 181);
+            previewBox.Size = new Size(514, 302);
             previewBox.SizeMode = PictureBoxSizeMode.Zoom;
             previewBox.TabIndex = 0;
             previewBox.TabStop = false;
@@ -95,15 +100,17 @@
             // 
             idBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             idBox.Font = new Font("Yu Gothic UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 128);
-            idBox.Location = new Point(93, 19);
+            idBox.Location = new Point(133, 32);
+            idBox.Margin = new Padding(4, 5, 4, 5);
             idBox.Name = "idBox";
-            idBox.Size = new Size(395, 39);
+            idBox.Size = new Size(563, 55);
             idBox.TabIndex = 1;
             idBox.TextChanged += idBox_TextChanged;
             // 
             // groupBox2
             // 
             groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox2.Controls.Add(radioHost);
             groupBox2.Controls.Add(label2);
             groupBox2.Controls.Add(mediaBox);
             groupBox2.Controls.Add(radioStaff);
@@ -113,19 +120,54 @@
             groupBox2.Controls.Add(execButton);
             groupBox2.Controls.Add(label1);
             groupBox2.Controls.Add(idBox);
-            groupBox2.Location = new Point(390, 12);
+            groupBox2.Location = new Point(557, 20);
+            groupBox2.Margin = new Padding(4, 5, 4, 5);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(494, 238);
+            groupBox2.Padding = new Padding(4, 5, 4, 5);
+            groupBox2.Size = new Size(706, 397);
             groupBox2.TabIndex = 2;
             groupBox2.TabStop = false;
             groupBox2.Text = "入力";
             // 
+            // radioHost
+            // 
+            radioHost.AutoSize = true;
+            radioHost.Location = new Point(395, 207);
+            radioHost.Margin = new Padding(4, 5, 4, 5);
+            radioHost.Name = "radioHost";
+            radioHost.Size = new Size(75, 29);
+            radioHost.TabIndex = 9;
+            radioHost.Text = "Host";
+            radioHost.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Yu Gothic UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 128);
+            label2.Location = new Point(9, 112);
+            label2.Margin = new Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new Size(119, 48);
+            label2.TabIndex = 8;
+            label2.Text = "Media";
+            // 
+            // mediaBox
+            // 
+            mediaBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            mediaBox.Font = new Font("Yu Gothic UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 128);
+            mediaBox.Location = new Point(133, 107);
+            mediaBox.Margin = new Padding(4, 5, 4, 5);
+            mediaBox.Name = "mediaBox";
+            mediaBox.Size = new Size(563, 55);
+            mediaBox.TabIndex = 7;
+            // 
             // radioStaff
             // 
             radioStaff.AutoSize = true;
-            radioStaff.Location = new Point(220, 124);
+            radioStaff.Location = new Point(314, 207);
+            radioStaff.Margin = new Padding(4, 5, 4, 5);
             radioStaff.Name = "radioStaff";
-            radioStaff.Size = new Size(48, 19);
+            radioStaff.Size = new Size(73, 29);
             radioStaff.TabIndex = 6;
             radioStaff.Text = "Staff";
             radioStaff.UseVisualStyleBackColor = true;
@@ -134,9 +176,10 @@
             // radioDay3
             // 
             radioDay3.AutoSize = true;
-            radioDay3.Location = new Point(163, 124);
+            radioDay3.Location = new Point(233, 207);
+            radioDay3.Margin = new Padding(4, 5, 4, 5);
             radioDay3.Name = "radioDay3";
-            radioDay3.Size = new Size(51, 19);
+            radioDay3.Size = new Size(78, 29);
             radioDay3.TabIndex = 5;
             radioDay3.Text = "Day3";
             radioDay3.UseVisualStyleBackColor = true;
@@ -145,9 +188,10 @@
             // radioDay2
             // 
             radioDay2.AutoSize = true;
-            radioDay2.Location = new Point(106, 124);
+            radioDay2.Location = new Point(151, 207);
+            radioDay2.Margin = new Padding(4, 5, 4, 5);
             radioDay2.Name = "radioDay2";
-            radioDay2.Size = new Size(51, 19);
+            radioDay2.Size = new Size(78, 29);
             radioDay2.TabIndex = 4;
             radioDay2.Text = "Day2";
             radioDay2.UseVisualStyleBackColor = true;
@@ -157,9 +201,10 @@
             // 
             radioDay1.AutoSize = true;
             radioDay1.Checked = true;
-            radioDay1.Location = new Point(49, 124);
+            radioDay1.Location = new Point(70, 207);
+            radioDay1.Margin = new Padding(4, 5, 4, 5);
             radioDay1.Name = "radioDay1";
-            radioDay1.Size = new Size(51, 19);
+            radioDay1.Size = new Size(78, 29);
             radioDay1.TabIndex = 3;
             radioDay1.TabStop = true;
             radioDay1.Text = "Day1";
@@ -171,9 +216,10 @@
             execButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             execButton.Enabled = false;
             execButton.Font = new Font("Yu Gothic UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 128);
-            execButton.Location = new Point(398, 191);
+            execButton.Location = new Point(569, 318);
+            execButton.Margin = new Padding(4, 5, 4, 5);
             execButton.Name = "execButton";
-            execButton.Size = new Size(90, 41);
+            execButton.Size = new Size(129, 68);
             execButton.TabIndex = 3;
             execButton.Text = "実行";
             execButton.UseVisualStyleBackColor = true;
@@ -183,70 +229,74 @@
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Yu Gothic UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 128);
-            label1.Location = new Point(6, 22);
+            label1.Location = new Point(9, 37);
+            label1.Margin = new Padding(4, 0, 4, 0);
             label1.Name = "label1";
-            label1.Size = new Size(37, 32);
+            label1.Size = new Size(55, 48);
             label1.TabIndex = 2;
             label1.Text = "ID";
             label1.Click += label1_Click;
             // 
             // contextMenuStrip1
             // 
+            contextMenuStrip1.ImageScalingSize = new Size(24, 24);
             contextMenuStrip1.Items.AddRange(new ToolStripItem[] { ConfigToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(123, 26);
+            contextMenuStrip1.Size = new Size(157, 36);
             // 
             // ConfigToolStripMenuItem
             // 
             ConfigToolStripMenuItem.Name = "ConfigToolStripMenuItem";
-            ConfigToolStripMenuItem.Size = new Size(122, 22);
+            ConfigToolStripMenuItem.Size = new Size(156, 32);
             ConfigToolStripMenuItem.Text = "環境設定";
             ConfigToolStripMenuItem.Click += ConfigToolStripMenuItem_Click;
             // 
             // statusStrip1
             // 
+            statusStrip1.ImageScalingSize = new Size(24, 24);
             statusStrip1.Items.AddRange(new ToolStripItem[] { gateLabel, printerLabel, readerLabel, toolStripStatusLabel1, errorLabel, toolStripEnvLabel });
-            statusStrip1.Location = new Point(0, 258);
+            statusStrip1.Location = new Point(0, 435);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(896, 22);
+            statusStrip1.Padding = new Padding(1, 0, 20, 0);
+            statusStrip1.Size = new Size(1280, 32);
             statusStrip1.TabIndex = 3;
             statusStrip1.Text = "statusStrip1";
             // 
             // gateLabel
             // 
             gateLabel.Name = "gateLabel";
-            gateLabel.Size = new Size(58, 17);
+            gateLabel.Size = new Size(88, 25);
             gateLabel.Text = "gateLabel";
             // 
             // printerLabel
             // 
             printerLabel.Name = "printerLabel";
-            printerLabel.Size = new Size(70, 17);
+            printerLabel.Size = new Size(105, 25);
             printerLabel.Text = "printerLabel";
             // 
             // readerLabel
             // 
             readerLabel.Name = "readerLabel";
-            readerLabel.Size = new Size(68, 17);
+            readerLabel.Size = new Size(103, 25);
             readerLabel.Text = "readerLabel";
             // 
             // toolStripStatusLabel1
             // 
             toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            toolStripStatusLabel1.Size = new Size(526, 17);
+            toolStripStatusLabel1.Size = new Size(722, 25);
             toolStripStatusLabel1.Spring = true;
             toolStripStatusLabel1.Click += toolStripStatusLabel1_Click;
             // 
             // errorLabel
             // 
             errorLabel.Name = "errorLabel";
-            errorLabel.Size = new Size(60, 17);
+            errorLabel.Size = new Size(91, 25);
             errorLabel.Text = "errorLabel";
             // 
             // toolStripEnvLabel
             // 
             toolStripEnvLabel.Name = "toolStripEnvLabel";
-            toolStripEnvLabel.Size = new Size(99, 17);
+            toolStripEnvLabel.Size = new Size(150, 25);
             toolStripEnvLabel.Text = "toolStripEnvLabel";
             // 
             // timer1
@@ -254,34 +304,16 @@
             timer1.Interval = 1000;
             timer1.Tick += timer1_Tick;
             // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Yu Gothic UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 128);
-            label2.Location = new Point(6, 67);
-            label2.Name = "label2";
-            label2.Size = new Size(81, 32);
-            label2.TabIndex = 8;
-            label2.Text = "Media";
-            // 
-            // mediaBox
-            // 
-            mediaBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            mediaBox.Font = new Font("Yu Gothic UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 128);
-            mediaBox.Location = new Point(93, 64);
-            mediaBox.Name = "mediaBox";
-            mediaBox.Size = new Size(395, 39);
-            mediaBox.TabIndex = 7;
-            // 
             // ReceptionForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(896, 280);
+            ClientSize = new Size(1280, 467);
             ContextMenuStrip = contextMenuStrip1;
             Controls.Add(statusStrip1);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
+            Margin = new Padding(4, 5, 4, 5);
             Name = "ReceptionForm";
             Text = "JANOG Reception";
             Load += ReceptionForm_Load;
@@ -321,5 +353,6 @@
         private ToolStripStatusLabel errorLabel;
         private Label label2;
         private TextBox mediaBox;
+        private RadioButton radioHost;
     }
 }

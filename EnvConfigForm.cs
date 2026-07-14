@@ -58,11 +58,11 @@ namespace janog_reception_ui
             // シリアルポート一覧を取得してコンボボックスへ設定
             var portList = BuildPortList();
             readerComboBox.Items.Clear();
-            
+
             readerComboBox.DataSource = portList;
             readerComboBox.DisplayMember = "Caption"; // 表示名
-            readerComboBox.ValueMember   = "Port";    // COMx
-                                                      // いったん非選択状態にする
+            readerComboBox.ValueMember = "Port";    // COMx
+                                                    // いったん非選択状態にする
             readerComboBox.SelectedIndex = -1;
             if (!string.IsNullOrWhiteSpace(config.Reader.Port))
             {
@@ -87,6 +87,7 @@ namespace janog_reception_ui
 
             textBoxGate.Text = config.Gate;
             printerComboBox.SelectedItem = config.Printer;
+            audioEnabledCheckBox.Checked = config.AudioEnabled;
             textBoxDevBaseUrl.Text = config.Environment.Develop.BaseUrl;
             textBoxDevUsername.Text = config.Environment.Develop.Username;
             textBoxDevPassword.Text = config.Environment.Develop.Password;
@@ -107,6 +108,7 @@ namespace janog_reception_ui
             }
             config.Gate = textBoxGate.Text;
             config.Printer = printerComboBox.SelectedItem.ToString();
+            config.AudioEnabled = audioEnabledCheckBox.Checked;
             config.Reader = new Reader
             {
                 Port = readerComboBox.SelectedValue.ToString(),
@@ -123,6 +125,38 @@ namespace janog_reception_ui
         private void label9_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private async void playSoundButton_Click(object sender, EventArgs e)
+        {
+            playSoundButton.Enabled = false;
+
+            try
+            {
+                string? exeDirPath = Path.GetDirectoryName(Application.ExecutablePath);
+                string soundPath = Path.Combine(exeDirPath ?? string.Empty, "voice-speakers.wav");
+
+                await Task.Run(() =>
+                {
+                    using var soundPlayer = new System.Media.SoundPlayer(soundPath);
+                    soundPlayer.PlaySync();
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "音声の再生に失敗しました: " + ex.Message,
+                    "エラー",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed)
+                {
+                    playSoundButton.Enabled = true;
+                }
+            }
         }
 
         public void HandleQrScan(string rawValue)

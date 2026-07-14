@@ -74,6 +74,7 @@ namespace janog_reception_ui
         public required string Gate {  get; set; }
         public required string Printer { get; set; }
         public required Reader Reader { get; set; }
+        public bool AudioEnabled { get; set; } = true;
 
         // 実行ファイルのディレクトリを返す関数
         private static string GetAppDir()
@@ -95,6 +96,7 @@ namespace janog_reception_ui
                 {
                     Gate = "default",
                     Printer = "",
+                    AudioEnabled = true,
                     Reader = new Reader
                     {
                       Port = "",  
