@@ -37,6 +37,9 @@
     <None Update="day3.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="host.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="label.lbx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

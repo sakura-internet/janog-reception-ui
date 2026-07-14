@@ -160,9 +160,13 @@ namespace janog_reception_ui
                 return;
             }
 
-            if (participant.Type == "staff" || participant.Type == "host")
+            if (participant.Type == "staff")
             {
                 SetDayImage("staff.png");
+            }
+            else if (participant.Type == "host")
+            {
+                SetDayImage("host.png");
             }
 
             SetLabelField("program", participant.Program);
@@ -205,6 +209,13 @@ namespace janog_reception_ui
         private void radioStaff_CheckedChanged(object sender, EventArgs e)
         {
             _currentImage = "staff.png";
+            SetDayImage(_currentImage);
+            UpdatePreview();
+        }
+
+        private void radioHost_CheckedChanged(object sender, EventArgs e)
+        {
+            _currentImage = "host.png";
             SetDayImage(_currentImage);
             UpdatePreview();
         }

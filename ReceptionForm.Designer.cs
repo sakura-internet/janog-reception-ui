@@ -139,6 +139,7 @@
             radioHost.TabIndex = 9;
             radioHost.Text = "Host";
             radioHost.UseVisualStyleBackColor = true;
+            radioHost.CheckedChanged += radioHost_CheckedChanged;
             // 
             // label2
             // 
