@@ -173,7 +173,7 @@ namespace janog_reception_ui
             SetLabelField("full_name", participant.FullName);
             SetLabelField("organization", participant.Organization);
             UpdatePreview();
-            if (participant.AcceptCount == 1)
+            if (participant.Type == "speaker" && participant.AcceptCount == 1)
             {
                 if (_config.AudioEnabled)
                 {
