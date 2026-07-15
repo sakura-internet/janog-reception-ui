@@ -47,6 +47,21 @@ namespace janog_reception_ui
         public required string Method { get; set; }
     }
 
+    public record class TerminalStatusRequest
+    {
+        [JsonPropertyName("name")]
+        public required string Name { get; set; }
+
+        [JsonPropertyName("status")]
+        public required string Status { get; set; }
+
+        [JsonPropertyName("event")]
+        public required string Event { get; set; }
+
+        [JsonPropertyName("error")]
+        public required string Error { get; set; }
+    }
+
 
     internal class Client
     {
@@ -61,14 +76,19 @@ namespace janog_reception_ui
             _password = password;
         }
 
+        private void SetAuthorizationHeader(HttpRequestMessage request)
+        {
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
+                "Basic",
+                Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _username, _password))));
+        }
+
         private HttpResponseMessage DoRequest(HttpRequestMessage request)
         {
             try
             {
                 // Basic認証ヘッダを付与する
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
-                "Basic",
-                    Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _username, _password))));
+                SetAuthorizationHeader(request);
 
                 // リクエストの送信
                 using (var httpClient = new HttpClient())
@@ -85,6 +105,47 @@ namespace janog_reception_ui
                 throw;
             }
         }
+
+        public async Task ReportTerminalStatusAsync(string name, string status, string eventName, string? error = null)
+        {
+            var payload = new TerminalStatusRequest
+            {
+                Name = name,
+                Status = status,
+                Event = eventName,
+                Error = error ?? string.Empty,
+            };
+
+            using var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(BaseURL + "/api/v1/terminal-status/"),
+                Content = new StringContent(
+                    JsonSerializer.Serialize(payload, GetJsonSerializerOptions()),
+                    Encoding.UTF8,
+                    "application/json"),
+            };
+            SetAuthorizationHeader(request);
+
+            try
+            {
+                using var httpClient = new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(5),
+                };
+                using var response = await httpClient.SendAsync(request);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception($"端末ステータスの送信に失敗しました (HTTP {(int)response.StatusCode})");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw;
+            }
+        }
+
         private static JsonSerializerOptions GetJsonSerializerOptions()
         {
             // ユニコードのレンジ指定で日本語も正しく表示、インデントされるように指定

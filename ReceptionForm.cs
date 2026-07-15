@@ -1,5 +1,6 @@
 using bpac;
 using Microsoft.VisualBasic.Logging;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Net.WebSockets;
 using System.Security.Policy;
@@ -18,6 +19,9 @@ namespace janog_reception_ui
         private string _currentImage = "day1.png";
         private EnvConfigForm? _activeEnvConfigForm;
         private int _isReceptionProcessing;
+        private static readonly TimeSpan PrintStatusTimeout = TimeSpan.FromSeconds(30);
+
+        private sealed record PrintStatusResult(int EventCode, int ErrorCode, string ErrorString);
 
         public ReceptionForm()
         {
@@ -101,73 +105,201 @@ namespace janog_reception_ui
             }
             finally
             {
-                File.Delete(filename);
+                _ = DeleteTempFileWithRetryAsync(filename);
             }
         }
 
-        private void PrintLabel()
+        private static async Task DeleteTempFileWithRetryAsync(string filename)
         {
-            var printStarted = false;
-            var printOutCompleted = false;
-            var printCompleted = false;
-            try
-            {
-                labelDocument.SetPrinter(_config.Printer, false);
-                labelDocument.StartPrint("", PrintOptionConstants.bpoAutoCut);
-                printStarted = true;
-                labelDocument.PrintOut(1, PrintOptionConstants.bpoAutoCut);
-                printOutCompleted = true;
-            }
-            finally
+            const int maxAttempts = 30;
+
+            for (var attempt = 1; attempt <= maxAttempts; attempt++)
             {
                 try
                 {
-                    if (printStarted)
-                    {
-                        labelDocument.EndPrint();
-                    }
-                    printCompleted = printOutCompleted;
+                    File.Delete(filename);
+                    return;
                 }
-                finally
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
                 {
-                    if (!printCompleted)
+                    if (attempt == maxAttempts)
                     {
-                        labelDocument.Close();
+                        System.Diagnostics.Debug.WriteLine(
+                            $"一時ファイルを削除できませんでした: {filename}: {ex.Message}");
+                        return;
                     }
                 }
+
+                await Task.Delay(100);
             }
         }
 
-        private void PrintSpeakersLabel()
+        private static Exception CreatePrintException(bpac.Document document, string stage, int? printEvent = null)
+        {
+            var documentErrorCode = 0;
+            var printerErrorCode = 0;
+            var printerErrorString = string.Empty;
+
+            try
+            {
+                documentErrorCode = document.ErrorCode;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to read document error code: {ex.Message}");
+            }
+
+            try
+            {
+                printerErrorCode = document.Printer.ErrorCode;
+                printerErrorString = document.Printer.ErrorString ?? string.Empty;
+            }
+            catch (Exception ex)
+            {
+                printerErrorString = ex.Message;
+            }
+
+            var eventText = printEvent.HasValue
+                ? Enum.IsDefined(typeof(PrintEvent), printEvent.Value)
+                    ? ((PrintEvent)printEvent.Value).ToString()
+                    : printEvent.Value.ToString()
+                : "none";
+            return new Exception(
+                $"{stage}: event={eventText}, documentErrorCode={documentErrorCode}, " +
+                $"printerErrorCode={printerErrorCode}, printerError={printerErrorString}");
+        }
+
+        private async Task PrintDocumentAsync(bpac.Document document)
+        {
+            var completion = new TaskCompletionSource<PrintStatusResult>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
+            var printStarted = false;
+
+            void PrintedHandler(int eventCode, object value)
+            {
+                try
+                {
+                    completion.TrySetResult(new PrintStatusResult(
+                        eventCode,
+                        document.Printer.ErrorCode,
+                        document.Printer.ErrorString ?? string.Empty));
+                }
+                catch (Exception ex)
+                {
+                    completion.TrySetResult(new PrintStatusResult(
+                        eventCode,
+                        -1,
+                        $"Failed to read printer status: {ex.Message}"));
+                }
+            }
+
+            document.Printed += PrintedHandler;
+            try
+            {
+                if (!document.SetPrinter(_config.Printer, false))
+                {
+                    throw CreatePrintException(document, "SetPrinter failed");
+                }
+                if (!document.StartPrint("", PrintOptionConstants.bpoAutoCut))
+                {
+                    throw CreatePrintException(document, "StartPrint failed");
+                }
+                printStarted = true;
+                if (!document.PrintOut(1, PrintOptionConstants.bpoAutoCut))
+                {
+                    throw CreatePrintException(document, "PrintOut failed");
+                }
+                if (!document.EndPrint())
+                {
+                    printStarted = false;
+                    throw CreatePrintException(document, "EndPrint failed");
+                }
+                printStarted = false;
+
+                PrintStatusResult result;
+                try
+                {
+                    result = await completion.Task.WaitAsync(PrintStatusTimeout);
+                }
+                catch (TimeoutException)
+                {
+                    throw CreatePrintException(document, "印刷状態確認タイムアウト (30秒)");
+                }
+
+                if (result.EventCode != (int)PrintEvent.bpePrinted || result.ErrorCode != 0)
+                {
+                    var eventText = Enum.IsDefined(typeof(PrintEvent), result.EventCode)
+                        ? ((PrintEvent)result.EventCode).ToString()
+                        : result.EventCode.ToString();
+                    throw new Exception(
+                        $"印刷エラー: event={eventText}, printerErrorCode={result.ErrorCode}, " +
+                        $"printerError={result.ErrorString}");
+                }
+            }
+            finally
+            {
+                if (printStarted)
+                {
+                    try
+                    {
+                        document.EndPrint();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"EndPrint cleanup failed: {ex.Message}");
+                    }
+                }
+                document.Printed -= PrintedHandler;
+            }
+        }
+
+        private void ResetLabelDocument()
+        {
+            string? exeDirPath = Path.GetDirectoryName(Application.ExecutablePath);
+            labelDocument.Close();
+            labelDocument = new bpac.Document();
+            if (!labelDocument.Open(Path.Combine(exeDirPath ?? string.Empty, "label.lbx")))
+            {
+                throw new Exception("Load label template error");
+            }
+            SetDayImage(_currentImage);
+        }
+
+        private async Task PrintLabelAsync()
+        {
+            try
+            {
+                await PrintDocumentAsync(labelDocument);
+            }
+            catch
+            {
+                try
+                {
+                    ResetLabelDocument();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Label document reset failed: {ex.Message}");
+                }
+                throw;
+            }
+        }
+
+        private async Task PrintSpeakersLabelAsync()
         {
             string? exeDirPath = Path.GetDirectoryName(Application.ExecutablePath);
             var speakersLabelDocument = new bpac.Document();
-            var printStarted = false;
             try
             {
-                if (!speakersLabelDocument.Open((exeDirPath ?? string.Empty) + "\\" + "label-speakers.lbx"))
+                if (!speakersLabelDocument.Open(Path.Combine(exeDirPath ?? string.Empty, "label-speakers.lbx")))
                 {
                     throw new Exception("Load speakers label template error");
                 }
-
-                speakersLabelDocument.SetPrinter(_config.Printer, false);
-                speakersLabelDocument.StartPrint("", PrintOptionConstants.bpoAutoCut);
-                printStarted = true;
-                speakersLabelDocument.PrintOut(1, PrintOptionConstants.bpoAutoCut);
+                await PrintDocumentAsync(speakersLabelDocument);
             }
             finally
             {
-                try
-                {
-                    if (printStarted)
-                    {
-                        speakersLabelDocument.EndPrint();
-                    }
-                }
-                finally
-                {
-                    speakersLabelDocument.Close();
-                }
+                speakersLabelDocument.Close();
             }
         }
         private void SetLabelField(string fieldName, string value)
@@ -187,9 +319,9 @@ namespace janog_reception_ui
             execButton.Enabled = regex.IsMatch(idBox.Text);
         }
 
-        private void execButton_Click(object sender, EventArgs e)
+        private async void execButton_Click(object sender, EventArgs e)
         {
-            ExecuteIfIdle();
+            await ExecuteIfIdleAsync();
         }
 
         private bool TryStartReception()
@@ -202,7 +334,7 @@ namespace janog_reception_ui
             Volatile.Write(ref _isReceptionProcessing, 0);
         }
 
-        private void ExecuteIfIdle()
+        private async Task ExecuteIfIdleAsync()
         {
             if (!TryStartReception())
             {
@@ -211,7 +343,7 @@ namespace janog_reception_ui
 
             try
             {
-                execute();
+                await ExecuteAsync();
             }
             finally
             {
@@ -219,7 +351,23 @@ namespace janog_reception_ui
             }
         }
 
-        private void execute()
+        private async Task ReportTerminalStatusSafelyAsync(
+            Client client,
+            string status,
+            string eventName,
+            string? error = null)
+        {
+            try
+            {
+                await client.ReportTerminalStatusAsync(_config.Gate, status, eventName, error);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Terminal status report failed: {ex.Message}");
+            }
+        }
+
+        private async Task ExecuteAsync()
         {
 
             errorLabel.Text = "";
@@ -235,32 +383,53 @@ namespace janog_reception_ui
             {
                 System.Media.SystemSounds.Beep.Play();
                 errorLabel.Text = ex.Message;
+                await ReportTerminalStatusSafelyAsync(client, "error", "受付処理エラー", ex.Message);
                 return;
             }
 
-            if (participant.Type == "staff")
+            try
             {
-                SetDayImage("staff.png");
-            }
-            else if (participant.Type == "host")
-            {
-                SetDayImage("host.png");
-            }
-
-            SetLabelField("program", participant.Program);
-            SetLabelField("full_name", participant.FullName);
-            SetLabelField("organization", participant.Organization);
-            UpdatePreview();
-            if (participant.Type == "speaker" && participant.AcceptCount == 1)
-            {
-                if (_config.AudioEnabled)
+                if (participant.Type == "staff")
                 {
-                    _speakersVoicePlayer.Play();
+                    SetDayImage("staff.png");
                 }
-                PrintSpeakersLabel();
+                else if (participant.Type == "host")
+                {
+                    SetDayImage("host.png");
+                }
+
+                SetLabelField("program", participant.Program);
+                SetLabelField("full_name", participant.FullName);
+                SetLabelField("organization", participant.Organization);
+                UpdatePreview();
+                if (participant.Type == "speaker" && participant.AcceptCount == 1)
+                {
+                    if (_config.AudioEnabled)
+                    {
+                        _speakersVoicePlayer.Play();
+                    }
+                    await PrintSpeakersLabelAsync();
+                }
+                await PrintLabelAsync();
+                await ReportTerminalStatusSafelyAsync(client, "ok", "印刷完了");
             }
-            PrintLabel();
-            SetDayImage(_currentImage);
+            catch (Exception ex)
+            {
+                System.Media.SystemSounds.Beep.Play();
+                errorLabel.Text = ex.Message;
+                await ReportTerminalStatusSafelyAsync(client, "error", "印刷エラー", ex.Message);
+            }
+            finally
+            {
+                try
+                {
+                    SetDayImage(_currentImage);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Failed to restore label image: {ex.Message}");
+                }
+            }
         }
 
         private void radioDay1_CheckedChanged(object sender, EventArgs e)
@@ -324,7 +493,7 @@ namespace janog_reception_ui
 
         }
 
-        private void printButton_Click(object sender, EventArgs e)
+        private async void printButton_Click(object sender, EventArgs e)
         {
             if (!TryStartReception())
             {
@@ -333,7 +502,19 @@ namespace janog_reception_ui
 
             try
             {
-                PrintLabel();
+                var auth = _config.Auth();
+                var client = new Client(auth.BaseUrl, auth.Username, auth.Password);
+                try
+                {
+                    await PrintLabelAsync();
+                    await ReportTerminalStatusSafelyAsync(client, "ok", "印刷完了");
+                }
+                catch (Exception ex)
+                {
+                    System.Media.SystemSounds.Beep.Play();
+                    errorLabel.Text = ex.Message;
+                    await ReportTerminalStatusSafelyAsync(client, "error", "印刷エラー", ex.Message);
+                }
             }
             finally
             {
@@ -404,7 +585,7 @@ namespace janog_reception_ui
                         // UIスレッドに処理を渡す
                         try
                         {
-                            BeginInvoke(new Action(() =>
+                            BeginInvoke(new Action(async () =>
                             {
                                 try
                                 {
@@ -412,7 +593,7 @@ namespace janog_reception_ui
                                     {
                                         idBox.Text = ulid;
                                         mediaBox.Text = beforeQuery;
-                                        execute();
+                                        await ExecuteAsync();
                                     }
                                 }
                                 finally
