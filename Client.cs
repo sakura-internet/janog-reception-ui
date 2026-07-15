@@ -73,7 +73,7 @@ namespace janog_reception_ui
                 // リクエストの送信
                 using (var httpClient = new HttpClient())
                 {
-                    httpClient.Timeout = TimeSpan.FromSeconds(30);
+                    httpClient.Timeout = TimeSpan.FromSeconds(5);
                     var response = httpClient.Send(request);
                     Debug.WriteLine(response);
                     return response;
