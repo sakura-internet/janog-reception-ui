@@ -17,6 +17,7 @@ namespace janog_reception_ui
         private readonly System.Media.SoundPlayer _speakersVoicePlayer;
         private string _currentImage = "day1.png";
         private EnvConfigForm? _activeEnvConfigForm;
+        private int _isReceptionProcessing;
 
         public ReceptionForm()
         {
@@ -84,40 +85,90 @@ namespace janog_reception_ui
         private void UpdatePreview()
         {
             string filename = Path.GetTempFileName();
-            labelDocument.Export(ExportType.bexBmp, filename, 72 * 4);
-
-            Image img;
-            using (var tmp = Image.FromFile(filename))
+            try
             {
-                img = (Image)tmp.Clone();  // メモリ上にコピー
-                tmp.Dispose();
-            }
+                labelDocument.Export(ExportType.bexBmp, filename, 72 * 4);
 
-            previewBox.Image = img;
+                Image img;
+                using (var tmp = Image.FromFile(filename))
+                {
+                    img = (Image)tmp.Clone();  // メモリ上にコピー
+                }
+
+                var previousImage = previewBox.Image;
+                previewBox.Image = img;
+                previousImage?.Dispose();
+            }
+            finally
+            {
+                File.Delete(filename);
+            }
         }
 
         private void PrintLabel()
         {
-            labelDocument.SetPrinter(_config.Printer, false);
-            labelDocument.StartPrint("", PrintOptionConstants.bpoAutoCut);
-            labelDocument.PrintOut(1, PrintOptionConstants.bpoAutoCut);
-            labelDocument.EndPrint();
+            var printStarted = false;
+            var printOutCompleted = false;
+            var printCompleted = false;
+            try
+            {
+                labelDocument.SetPrinter(_config.Printer, false);
+                labelDocument.StartPrint("", PrintOptionConstants.bpoAutoCut);
+                printStarted = true;
+                labelDocument.PrintOut(1, PrintOptionConstants.bpoAutoCut);
+                printOutCompleted = true;
+            }
+            finally
+            {
+                try
+                {
+                    if (printStarted)
+                    {
+                        labelDocument.EndPrint();
+                    }
+                    printCompleted = printOutCompleted;
+                }
+                finally
+                {
+                    if (!printCompleted)
+                    {
+                        labelDocument.Close();
+                    }
+                }
+            }
         }
 
         private void PrintSpeakersLabel()
         {
             string? exeDirPath = Path.GetDirectoryName(Application.ExecutablePath);
             var speakersLabelDocument = new bpac.Document();
-            if (!speakersLabelDocument.Open((exeDirPath ?? string.Empty) + "\\" + "label-speakers.lbx"))
+            var printStarted = false;
+            try
             {
-                throw new Exception("Load speakers label template error");
-            }
+                if (!speakersLabelDocument.Open((exeDirPath ?? string.Empty) + "\\" + "label-speakers.lbx"))
+                {
+                    throw new Exception("Load speakers label template error");
+                }
 
-            speakersLabelDocument.SetPrinter(_config.Printer, false);
-            speakersLabelDocument.StartPrint("", PrintOptionConstants.bpoAutoCut);
-            speakersLabelDocument.PrintOut(1, PrintOptionConstants.bpoAutoCut);
-            speakersLabelDocument.EndPrint();
-            speakersLabelDocument.Close();
+                speakersLabelDocument.SetPrinter(_config.Printer, false);
+                speakersLabelDocument.StartPrint("", PrintOptionConstants.bpoAutoCut);
+                printStarted = true;
+                speakersLabelDocument.PrintOut(1, PrintOptionConstants.bpoAutoCut);
+            }
+            finally
+            {
+                try
+                {
+                    if (printStarted)
+                    {
+                        speakersLabelDocument.EndPrint();
+                    }
+                }
+                finally
+                {
+                    speakersLabelDocument.Close();
+                }
+            }
         }
         private void SetLabelField(string fieldName, string value)
         {
@@ -138,7 +189,34 @@ namespace janog_reception_ui
 
         private void execButton_Click(object sender, EventArgs e)
         {
-            execute();
+            ExecuteIfIdle();
+        }
+
+        private bool TryStartReception()
+        {
+            return Interlocked.CompareExchange(ref _isReceptionProcessing, 1, 0) == 0;
+        }
+
+        private void FinishReception()
+        {
+            Volatile.Write(ref _isReceptionProcessing, 0);
+        }
+
+        private void ExecuteIfIdle()
+        {
+            if (!TryStartReception())
+            {
+                return;
+            }
+
+            try
+            {
+                execute();
+            }
+            finally
+            {
+                FinishReception();
+            }
         }
 
         private void execute()
@@ -248,7 +326,19 @@ namespace janog_reception_ui
 
         private void printButton_Click(object sender, EventArgs e)
         {
-            PrintLabel();
+            if (!TryStartReception())
+            {
+                return;
+            }
+
+            try
+            {
+                PrintLabel();
+            }
+            finally
+            {
+                FinishReception();
+            }
         }
 
         StringBuilder buffer = new StringBuilder();
@@ -303,20 +393,42 @@ namespace janog_reception_ui
                     var ulid = TryExtractUlid(line);
                     if (ulid != "")
                     {
+                        if (!TryStartReception())
+                        {
+                            continue;
+                        }
 
                         int q = line.IndexOf('?');
                         string beforeQuery = q >= 0 ? line.Substring(0, q) : line;
 
                         // UIスレッドに処理を渡す
-                        BeginInvoke(new Action(() =>
+                        try
                         {
-                            if (idBox.Text != ulid)
+                            BeginInvoke(new Action(() =>
                             {
-                                idBox.Text = ulid;
-                                mediaBox.Text = beforeQuery;
-                                execute();
-                            }
-                        }));
+                                try
+                                {
+                                    if (idBox.Text != ulid)
+                                    {
+                                        idBox.Text = ulid;
+                                        mediaBox.Text = beforeQuery;
+                                        execute();
+                                    }
+                                }
+                                finally
+                                {
+                                    FinishReception();
+                                }
+                            }));
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            FinishReception();
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            FinishReception();
+                        }
                     }
                 }
             }
@@ -345,6 +457,20 @@ namespace janog_reception_ui
         private void label1_Click(object sender, EventArgs e)
         {
             System.Media.SystemSounds.Beep.Play();
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            try
+            {
+                previewBox.Image?.Dispose();
+                previewBox.Image = null;
+                labelDocument.Close();
+            }
+            finally
+            {
+                base.OnFormClosed(e);
+            }
         }
     }
 }
