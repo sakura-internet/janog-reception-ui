@@ -62,9 +62,17 @@ namespace janog_reception_ui
         public required string Error { get; set; }
     }
 
+    public record class TerminalStatusHeartbeatRequest
+    {
+        [JsonPropertyName("name")]
+        public required string Name { get; set; }
+    }
+
 
     internal class Client
     {
+        internal static event Action? TerminalStatusReported;
+
         private string _username;
         private string _password;
         public string BaseURL;
@@ -137,6 +145,45 @@ namespace janog_reception_ui
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new Exception($"端末ステータスの送信に失敗しました (HTTP {(int)response.StatusCode})");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw;
+            }
+
+            TerminalStatusReported?.Invoke();
+        }
+
+        public async Task ReportTerminalStatusHeartbeatAsync(string name)
+        {
+            var payload = new TerminalStatusHeartbeatRequest
+            {
+                Name = name,
+            };
+
+            using var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(BaseURL + "/api/v1/terminal-status/heartbeat/"),
+                Content = new StringContent(
+                    JsonSerializer.Serialize(payload, GetJsonSerializerOptions()),
+                    Encoding.UTF8,
+                    "application/json"),
+            };
+            SetAuthorizationHeader(request);
+
+            try
+            {
+                using var httpClient = new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(5),
+                };
+                using var response = await httpClient.SendAsync(request);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception($"Terminal heartbeat request failed (HTTP {(int)response.StatusCode})");
                 }
             }
             catch (Exception e)
