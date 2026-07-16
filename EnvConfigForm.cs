@@ -1,92 +1,43 @@
-﻿using bpac;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+using bpac;
 using System.Drawing.Printing;
 using System.IO.Ports;
-using System.Linq;
 using System.Management;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
+using System.Text.RegularExpressions;
 
 namespace janog_reception_ui
 {
     public partial class EnvConfigForm : Form
     {
+        internal Config config = null!;
 
-        bpac.Document labelDocument;
-        internal Config config;
+        private readonly List<ReceptionSetConfig> _workingSets = new();
+        private bool _changingSelection;
+        private int _selectedSetIndex = -1;
+        private Document? _printerDocument;
 
         public EnvConfigForm()
         {
             InitializeComponent();
         }
 
-        private void groupBox1_Enter(object sender, EventArgs e)
-        {
-
-        }
-
         private void EnvConfigForm_Load(object sender, EventArgs e)
         {
-            labelDocument = new bpac.Document();
-            var printers = labelDocument.Printer.GetInstalledPrinters();
-            printerComboBox.Items.Clear();
+            config.Normalize();
+            _workingSets.Clear();
+            _workingSets.AddRange(config.ReceptionSets.Select(set => set.Clone()));
+            EnsureAtLeastOneSet();
 
-            // プリンタ一覧を取得してコンボボックスへ設定
-            foreach (string printer in PrinterSettings.InstalledPrinters)
-            {
-                if (labelDocument.Printer.IsPrinterSupported(printer))
-                {
-                    printerComboBox.Items.Add(printer);
-                    if (printer == config.Printer)
-                    {
-                        printerComboBox.SelectedItem = printer;
-                    }
-                }
-            }
-
-            // シリアルポート一覧を取得してコンボボックスへ設定
-            var portList = BuildPortList();
-            readerComboBox.Items.Clear();
-
-            readerComboBox.DataSource = portList;
-            readerComboBox.DisplayMember = "Caption"; // 表示名
-            readerComboBox.ValueMember = "Port";    // COMx
-                                                    // いったん非選択状態にする
-            readerComboBox.SelectedIndex = -1;
-            if (!string.IsNullOrWhiteSpace(config.Reader.Port))
-            {
-                // ValueMember (= Port) と一致するものがあれば選択される
-                readerComboBox.SelectedValue = config.Reader.Port;
-            }
-
+            PopulatePrinterList();
+            PopulateReaderList();
+            LoadGlobalSettings();
+            RefreshSetList(0);
         }
 
-        private void EnvConfigForm_Shown(object sender, EventArgs e)
+        private void LoadGlobalSettings()
         {
-            if (config.Environment.Environment != EnvironmentKind.Production)
-            {
-                radioEnvDevelop.Checked = true;
-                radioEnvProduction.Checked = false;
-            }
-            else
-            {
-                radioEnvDevelop.Checked = false;
-                radioEnvProduction.Checked = true;
-            }
-
-            textBoxGate.Text = config.Gate;
-            printerComboBox.SelectedItem = config.Printer;
+            radioEnvProduction.Checked = config.Environment.Environment == EnvironmentKind.Production;
+            radioEnvDevelop.Checked = !radioEnvProduction.Checked;
             audioEnabledCheckBox.Checked = config.AudioEnabled;
             textBoxDevBaseUrl.Text = config.Environment.Develop.BaseUrl;
             textBoxDevUsername.Text = config.Environment.Develop.Username;
@@ -96,46 +47,219 @@ namespace janog_reception_ui
             textBoxProdPassword.Text = config.Environment.Production.Password;
         }
 
+        private void PopulatePrinterList()
+        {
+            _printerDocument = new Document();
+            printerComboBox.Items.Clear();
+            printerComboBox.Items.Add(string.Empty);
+
+            foreach (string printer in PrinterSettings.InstalledPrinters)
+            {
+                if (_printerDocument.Printer.IsPrinterSupported(printer))
+                {
+                    AddPrinterIfMissing(printer);
+                }
+            }
+
+            foreach (var set in _workingSets)
+            {
+                AddPrinterIfMissing(set.Printer);
+            }
+        }
+
+        private void AddPrinterIfMissing(string? printer)
+        {
+            string value = printer ?? string.Empty;
+            if (!printerComboBox.Items.Cast<string>().Contains(value, StringComparer.OrdinalIgnoreCase))
+            {
+                printerComboBox.Items.Add(value);
+            }
+        }
+
+        private void PopulateReaderList()
+        {
+            readerComboBox.Items.Clear();
+            readerComboBox.Items.Add(new SerialPortItem(string.Empty, string.Empty));
+            foreach (var port in BuildPortList())
+            {
+                AddReaderIfMissing(port.Port, port.Caption);
+            }
+            foreach (var set in _workingSets)
+            {
+                AddReaderIfMissing(set.Reader.Port, set.Reader.Port);
+            }
+        }
+
+        private void AddReaderIfMissing(string? port, string? caption)
+        {
+            string value = port ?? string.Empty;
+            if (readerComboBox.Items.Cast<SerialPortItem>()
+                .Any(item => string.Equals(item.Port, value, StringComparison.OrdinalIgnoreCase)))
+            {
+                return;
+            }
+            readerComboBox.Items.Add(new SerialPortItem(value, caption ?? value));
+        }
+
+        private void EnsureAtLeastOneSet()
+        {
+            if (_workingSets.Count == 0)
+            {
+                _workingSets.Add(new ReceptionSetConfig());
+            }
+        }
+
+        private static string BuildSetDisplayName(ReceptionSetConfig set, int index)
+        {
+            string gate = string.IsNullOrWhiteSpace(set.Gate) ? "未設定" : set.Gate;
+            return $"{index + 1}. {gate}";
+        }
+
+        private void RefreshSetList(int selectedIndex)
+        {
+            _changingSelection = true;
+            try
+            {
+                setListBox.BeginUpdate();
+                setListBox.Items.Clear();
+                for (var i = 0; i < _workingSets.Count; i++)
+                {
+                    setListBox.Items.Add(BuildSetDisplayName(_workingSets[i], i));
+                }
+                setListBox.EndUpdate();
+
+                selectedIndex = Math.Clamp(selectedIndex, 0, _workingSets.Count - 1);
+                setListBox.SelectedIndex = selectedIndex;
+                _selectedSetIndex = selectedIndex;
+                LoadSetEditor(_workingSets[selectedIndex]);
+                UpdateMoveButtons();
+            }
+            finally
+            {
+                _changingSelection = false;
+            }
+        }
+
+        private void LoadSetEditor(ReceptionSetConfig set)
+        {
+            textBoxGate.Text = set.Gate;
+            AddPrinterIfMissing(set.Printer);
+            printerComboBox.SelectedItem = set.Printer;
+            if (printerComboBox.SelectedIndex < 0) printerComboBox.SelectedIndex = 0;
+
+            AddReaderIfMissing(set.Reader.Port, set.Reader.Port);
+            readerComboBox.SelectedItem = readerComboBox.Items.Cast<SerialPortItem>()
+                .First(item => string.Equals(item.Port, set.Reader.Port, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private void SaveSetEditor(int index)
+        {
+            if (index < 0 || index >= _workingSets.Count) return;
+            var set = _workingSets[index];
+            set.Gate = textBoxGate.Text;
+            set.Printer = printerComboBox.SelectedItem?.ToString() ?? string.Empty;
+            set.Reader = new Reader
+            {
+                Port = (readerComboBox.SelectedItem as SerialPortItem)?.Port ?? string.Empty,
+                Serial = set.Reader.Serial,
+            };
+        }
+
+        private void setListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_changingSelection || setListBox.SelectedIndex < 0) return;
+            SaveSetEditor(_selectedSetIndex);
+            int newIndex = setListBox.SelectedIndex;
+            _selectedSetIndex = newIndex;
+            _changingSelection = true;
+            try
+            {
+                LoadSetEditor(_workingSets[newIndex]);
+                UpdateMoveButtons();
+            }
+            finally
+            {
+                _changingSelection = false;
+            }
+        }
+
+        private void addSetButton_Click(object sender, EventArgs e)
+        {
+            SaveSetEditor(_selectedSetIndex);
+            _workingSets.Add(new ReceptionSetConfig());
+            RefreshSetList(_workingSets.Count - 1);
+            textBoxGate.Focus();
+        }
+
+        private void deleteSetButton_Click(object sender, EventArgs e)
+        {
+            if (_selectedSetIndex < 0) return;
+            if (_workingSets.Count == 1)
+            {
+                _workingSets[0] = new ReceptionSetConfig();
+                RefreshSetList(0);
+                return;
+            }
+
+            int nextIndex = Math.Min(_selectedSetIndex, _workingSets.Count - 2);
+            _workingSets.RemoveAt(_selectedSetIndex);
+            RefreshSetList(nextIndex);
+        }
+
+        private void moveUpButton_Click(object sender, EventArgs e)
+        {
+            MoveSelectedSet(-1);
+        }
+
+        private void moveDownButton_Click(object sender, EventArgs e)
+        {
+            MoveSelectedSet(1);
+        }
+
+        private void MoveSelectedSet(int offset)
+        {
+            SaveSetEditor(_selectedSetIndex);
+            int destination = _selectedSetIndex + offset;
+            if (_selectedSetIndex < 0 || destination < 0 || destination >= _workingSets.Count) return;
+            (_workingSets[_selectedSetIndex], _workingSets[destination]) =
+                (_workingSets[destination], _workingSets[_selectedSetIndex]);
+            RefreshSetList(destination);
+        }
+
+        private void UpdateMoveButtons()
+        {
+            moveUpButton.Enabled = _selectedSetIndex > 0;
+            moveDownButton.Enabled = _selectedSetIndex >= 0 && _selectedSetIndex < _workingSets.Count - 1;
+        }
+
         private void EnvConfigForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (radioEnvProduction.Checked)
-            {
-                config.Environment.Environment = EnvironmentKind.Production;
-            }
-            else
-            {
-                config.Environment.Environment = EnvironmentKind.Develop;
-            }
-            config.Gate = textBoxGate.Text;
-            config.Printer = printerComboBox.SelectedItem.ToString();
+            SaveSetEditor(_selectedSetIndex);
+            EnsureAtLeastOneSet();
+            config.ReceptionSets = _workingSets.Select(set => set.Clone()).ToList();
+            config.Environment.Environment = radioEnvProduction.Checked
+                ? EnvironmentKind.Production
+                : EnvironmentKind.Develop;
             config.AudioEnabled = audioEnabledCheckBox.Checked;
-            config.Reader = new Reader
-            {
-                Port = readerComboBox.SelectedValue.ToString(),
-                Serial = "",
-            };
             config.Environment.Develop.BaseUrl = textBoxDevBaseUrl.Text;
             config.Environment.Develop.Username = textBoxDevUsername.Text;
             config.Environment.Develop.Password = textBoxDevPassword.Text;
             config.Environment.Production.BaseUrl = textBoxProdBaseUrl.Text;
             config.Environment.Production.Username = textBoxProdUsername.Text;
             config.Environment.Production.Password = textBoxProdPassword.Text;
-        }
-
-        private void label9_Click(object sender, EventArgs e)
-        {
-
+            try { _printerDocument?.Close(); }
+            catch { }
+            _printerDocument = null;
         }
 
         private async void playSoundButton_Click(object sender, EventArgs e)
         {
             playSoundButton.Enabled = false;
-
             try
             {
-                string? exeDirPath = Path.GetDirectoryName(Application.ExecutablePath);
-                string soundPath = Path.Combine(exeDirPath ?? string.Empty, "voice-speakers.wav");
-
+                string soundPath = Path.Combine(
+                    Path.GetDirectoryName(Application.ExecutablePath) ?? string.Empty,
+                    "voice-speakers.wav");
                 await Task.Run(() =>
                 {
                     using var soundPlayer = new System.Media.SoundPlayer(soundPath);
@@ -152,23 +276,15 @@ namespace janog_reception_ui
             }
             finally
             {
-                if (!IsDisposed)
-                {
-                    playSoundButton.Enabled = true;
-                }
+                if (!IsDisposed) playSoundButton.Enabled = true;
             }
         }
 
         public void HandleQrScan(string rawValue)
         {
-            if (!TryParseQrCredentials(rawValue, out var credentials))
-            {
-                return;
-            }
-
+            if (!TryParseQrCredentials(rawValue, out var credentials)) return;
             using var dialog = new QrImportConfirmDialog();
             var result = dialog.ShowDialog(this);
-
             if (result == DialogResult.Yes)
             {
                 textBoxDevBaseUrl.Text = credentials.Url;
@@ -186,7 +302,6 @@ namespace janog_reception_ui
         private static bool TryParseQrCredentials(string rawValue, out QrCredentials credentials)
         {
             credentials = default;
-
             try
             {
                 using var document = JsonDocument.Parse(rawValue);
@@ -199,9 +314,9 @@ namespace janog_reception_ui
                     return false;
                 }
 
-                var urlValue = url.GetString();
-                var usernameValue = username.GetString();
-                var passwordValue = password.GetString();
+                string? urlValue = url.GetString();
+                string? usernameValue = username.GetString();
+                string? passwordValue = password.GetString();
                 if (string.IsNullOrWhiteSpace(urlValue) ||
                     string.IsNullOrWhiteSpace(usernameValue) ||
                     string.IsNullOrWhiteSpace(passwordValue))
@@ -218,53 +333,40 @@ namespace janog_reception_ui
             }
         }
 
-        static Dictionary<string, string> GetComCaptionMapByPnP()
+        private static Dictionary<string, string> GetComCaptionMapByPnP()
         {
             var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var regex = new Regex(@"\(COM\d+\)", RegexOptions.IgnoreCase);
-
             using var searcher = new ManagementObjectSearcher(
-                "SELECT Name FROM Win32_PnPEntity WHERE Name LIKE '%(COM%'"
-            );
+                "SELECT Name FROM Win32_PnPEntity WHERE Name LIKE '%(COM%'");
 
-            foreach (ManagementObject mo in searcher.Get())
+            foreach (ManagementObject managementObject in searcher.Get())
             {
-                var name = mo["Name"]?.ToString();
+                string? name = managementObject["Name"]?.ToString();
                 if (string.IsNullOrWhiteSpace(name)) continue;
-
-                var m = regex.Match(name);
-                if (!m.Success) continue;
-
-                // "(COM3)" -> "COM3"
-                var com = m.Value.Trim('(', ')');
-                if (!map.ContainsKey(com))
-                    map[com] = name; // "USB Serial Device (COM3)" 等
+                var match = regex.Match(name);
+                if (!match.Success) continue;
+                string com = match.Value.Trim('(', ')');
+                map.TryAdd(com, name);
             }
-
             return map;
         }
 
-        static SerialPortItem[] BuildPortList()
+        private static SerialPortItem[] BuildPortList()
         {
-            var ports = SerialPort.GetPortNames()
-                                  .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
-                                  .ToArray();
-
             var captionMap = GetComCaptionMapByPnP();
-
-            return ports.Select(com =>
-                new SerialPortItem
-                {
-                    Port = com,
-                    Caption = captionMap.TryGetValue(com, out var cap) ? cap : com
-                })
+            return SerialPort.GetPortNames()
+                .OrderBy(port => port, StringComparer.OrdinalIgnoreCase)
+                .Select(port => new SerialPortItem(
+                    port,
+                    captionMap.TryGetValue(port, out var caption) ? caption : port))
                 .ToArray();
         }
     }
-    class SerialPortItem
+
+    internal sealed record SerialPortItem(string Port, string Caption)
     {
-        public string Caption { get; set; }
-        public string Port { get; set; }
+        public override string ToString() => string.IsNullOrEmpty(Port) ? string.Empty : Caption;
     }
 
     internal readonly record struct QrCredentials(string Url, string Username, string Password);
@@ -285,29 +387,28 @@ namespace janog_reception_ui
             {
                 AutoSize = true,
                 Location = new Point(20, 20),
-                Text = "設定値を入力しますか"
+                Text = "設定値を入力しますか",
             };
-
             var developButton = new Button
             {
                 DialogResult = DialogResult.Yes,
                 Location = new Point(20, 65),
                 Size = new Size(105, 30),
-                Text = "開発環境"
+                Text = "開発環境",
             };
             var productionButton = new Button
             {
                 DialogResult = DialogResult.No,
                 Location = new Point(142, 65),
                 Size = new Size(105, 30),
-                Text = "本番環境"
+                Text = "本番環境",
             };
             var cancelButton = new Button
             {
                 DialogResult = DialogResult.Cancel,
                 Location = new Point(264, 65),
                 Size = new Size(105, 30),
-                Text = "キャンセル"
+                Text = "キャンセル",
             };
 
             Controls.AddRange(new Control[] { message, developButton, productionButton, cancelButton });
@@ -315,5 +416,4 @@ namespace janog_reception_ui
             CancelButton = cancelButton;
         }
     }
-
 }

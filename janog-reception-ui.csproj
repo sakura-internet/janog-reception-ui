@@ -54,4 +54,25 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="ReceptionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ReceptionForm.Designer.cs">
+      <DependentUpon>ReceptionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Update="EnvConfigForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="EnvConfigForm.Designer.cs">
+      <DependentUpon>EnvConfigForm.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ReceptionSetControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="ReceptionSetControl.Designer.cs">
+      <DependentUpon>ReceptionSetControl.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>

@@ -71,8 +71,6 @@ namespace janog_reception_ui
 
     internal class Client
     {
-        internal static event Action? TerminalStatusReported;
-
         private string _username;
         private string _password;
         public string BaseURL;
@@ -153,7 +151,6 @@ namespace janog_reception_ui
                 throw;
             }
 
-            TerminalStatusReported?.Invoke();
         }
 
         public async Task ReportTerminalStatusHeartbeatAsync(string name)

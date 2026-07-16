@@ -4,7 +4,7 @@
 JANOG57 の現地受付業務のために、さくらインターネットが開発した Windows アプリケーションです。
 別途稼働している参加登録システムと連携し、QRコードリーダーとブラザー社のラベルプリンターを利用して「参加者の受付（来場処理）」と「名札ラベル印刷」を行います。
 
-実行ファイルも含め、複数コピーを作成することで一台のPCで複数のQRコードとラベルプリンターを制御することができます。
+1つのアプリで複数のQRコードリーダーとラベルプリンターをセット単位で制御できます。
 
 ![メイン画面](docs/main.png)
 
@@ -28,7 +28,8 @@ JANOG57 の現地受付業務のために、さくらインターネットが開
 
 ## リポジトリ構成（抜粋）
 
-- `ReceptionForm.cs` : 受付UI、シリアル入力の受信、API呼び出し、印刷処理
+- `ReceptionForm.cs` : 複数の受付セットを縦に表示するメイン画面
+- `ReceptionSetControl.cs` : セットごとの受付UI、シリアル入力、API呼び出し、印刷処理
 - `Client.cs` : 参加登録システム API クライアント（Basic認証）
 - `Config.cs` : `config.yaml` の読み書き
 - `label.lbx` : ラベルテンプレート（b-PAC）
@@ -61,21 +62,29 @@ Visual Studio 2026（Windows）で `janog-reception-ui.sln` を開いてビル�
 
 ```yaml
 environment:
-	environment: develop # develop | production
-	develop:
-		base_url: "https://dev.example.com"
-		username: "username"
-		password: "password"
-	production:
-		base_url: "https://prod.example.com"
-		username: "username"
-		password: "password"
+  environment: develop # develop | production
+  develop:
+    base_url: "https://dev.example.com"
+    username: "username"
+    password: "password"
+  production:
+    base_url: "https://prod.example.com"
+    username: "username"
+    password: "password"
 
-gate: "default"          # 受付ゲート名（APIに送信）
-printer: ""              # 使用するプリンター名（Windowsのプリンター一覧の表示名）
-reader:
-	port: "COM3"           # QRリーダーのCOMポート
-	serial: ""             # 現状は未使用
+reception_sets:
+  - gate: "gate-a"       # 受付ゲート名（APIに送信）
+    printer: "QL-820NWB" # Windowsのプリンター一覧の表示名
+    reader:
+      port: "COM3"       # QRリーダーのCOMポート
+      serial: ""         # 現状は未使用
+  - gate: "gate-b"
+    printer: "QL-820NWB (Copy 1)"
+    reader:
+      port: "COM4"
+      serial: ""
+
+audio_enabled: true
 ```
 
 ### 設定画面（アプリ内）
@@ -85,15 +94,16 @@ reader:
 設定画面では以下を指定します。
 
 - 環境（Develop / Production）
-- ゲート名（Gate）
-- プリンター（b-PAC 対応のプリンターのみが候補に表示されます）
-- リーダー（COMポート。PnP 名称付きで表示される場合があります）
+- 受付セットの追加・削除・並び替え
+- セットごとのゲート名（Gate）
+- セットごとのプリンター（b-PAC 対応のプリンターのみが候補に表示されます）
+- セットごとのリーダー（COMポート。PnP 名称付きで表示される場合があります）
 - API 接続情報（Base URL / Username / Password）
 
 ## 使い方（運用フロー）
 
 1. アプリを起動
-2. 右クリックで表示されるメニューから開く設定画面で ゲート情報 / プリンタ / QRリーダー / API 認証情報を設定
+2. 右クリックで表示されるメニューから設定画面を開き、受付セットと API 認証情報を設定
 3. 会期（日別）を選択（Day1/Day2/Day3 など）
 4. QRコードを読み取ると自動で受付情報を送信し、参加者情報をラベルに反映して印刷します
 
