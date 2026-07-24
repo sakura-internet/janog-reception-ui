@@ -23,13 +23,8 @@ namespace janog_reception_ui
             printButton = new Button();
             previewBox = new PictureBox();
             inputGroupBox = new GroupBox();
-            radioHost = new RadioButton();
             mediaLabel = new Label();
             mediaBox = new TextBox();
-            radioStaff = new RadioButton();
-            radioDay3 = new RadioButton();
-            radioDay2 = new RadioButton();
-            radioDay1 = new RadioButton();
             clearButton = new Button();
             execButton = new Button();
             idLabel = new Label();
@@ -62,6 +57,7 @@ namespace janog_reception_ui
             // printButton
             // 
             printButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            printButton.Enabled = false;
             printButton.Location = new Point(416, 359);
             printButton.Name = "printButton";
             printButton.Size = new Size(107, 38);
@@ -83,13 +79,8 @@ namespace janog_reception_ui
             // inputGroupBox
             // 
             inputGroupBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            inputGroupBox.Controls.Add(radioHost);
             inputGroupBox.Controls.Add(mediaLabel);
             inputGroupBox.Controls.Add(mediaBox);
-            inputGroupBox.Controls.Add(radioStaff);
-            inputGroupBox.Controls.Add(radioDay3);
-            inputGroupBox.Controls.Add(radioDay2);
-            inputGroupBox.Controls.Add(radioDay1);
             inputGroupBox.Controls.Add(clearButton);
             inputGroupBox.Controls.Add(execButton);
             inputGroupBox.Controls.Add(idLabel);
@@ -100,17 +91,6 @@ namespace janog_reception_ui
             inputGroupBox.TabIndex = 1;
             inputGroupBox.TabStop = false;
             inputGroupBox.Text = "入力";
-            // 
-            // radioHost
-            // 
-            radioHost.AutoSize = true;
-            radioHost.Location = new Point(95, 228);
-            radioHost.Name = "radioHost";
-            radioHost.Size = new Size(75, 29);
-            radioHost.TabIndex = 9;
-            radioHost.Text = "Host";
-            radioHost.UseVisualStyleBackColor = true;
-            radioHost.CheckedChanged += radioHost_CheckedChanged;
             // 
             // mediaLabel
             // 
@@ -130,52 +110,6 @@ namespace janog_reception_ui
             mediaBox.Name = "mediaBox";
             mediaBox.Size = new Size(563, 55);
             mediaBox.TabIndex = 7;
-            // 
-            // radioStaff
-            // 
-            radioStaff.AutoSize = true;
-            radioStaff.Location = new Point(14, 228);
-            radioStaff.Name = "radioStaff";
-            radioStaff.Size = new Size(73, 29);
-            radioStaff.TabIndex = 6;
-            radioStaff.Text = "Staff";
-            radioStaff.UseVisualStyleBackColor = true;
-            radioStaff.CheckedChanged += radioStaff_CheckedChanged;
-            // 
-            // radioDay3
-            // 
-            radioDay3.AutoSize = true;
-            radioDay3.Location = new Point(177, 193);
-            radioDay3.Name = "radioDay3";
-            radioDay3.Size = new Size(78, 29);
-            radioDay3.TabIndex = 5;
-            radioDay3.Text = "Day3";
-            radioDay3.UseVisualStyleBackColor = true;
-            radioDay3.CheckedChanged += radioDay3_CheckedChanged;
-            // 
-            // radioDay2
-            // 
-            radioDay2.AutoSize = true;
-            radioDay2.Location = new Point(95, 193);
-            radioDay2.Name = "radioDay2";
-            radioDay2.Size = new Size(78, 29);
-            radioDay2.TabIndex = 4;
-            radioDay2.Text = "Day2";
-            radioDay2.UseVisualStyleBackColor = true;
-            radioDay2.CheckedChanged += radioDay2_CheckedChanged;
-            // 
-            // radioDay1
-            // 
-            radioDay1.AutoSize = true;
-            radioDay1.Checked = true;
-            radioDay1.Location = new Point(14, 193);
-            radioDay1.Name = "radioDay1";
-            radioDay1.Size = new Size(78, 29);
-            radioDay1.TabIndex = 3;
-            radioDay1.TabStop = true;
-            radioDay1.Text = "Day1";
-            radioDay1.UseVisualStyleBackColor = true;
-            radioDay1.CheckedChanged += radioDay1_CheckedChanged;
             // 
             // clearButton
             // 
@@ -318,13 +252,8 @@ namespace janog_reception_ui
         private Button printButton;
         private PictureBox previewBox;
         private GroupBox inputGroupBox;
-        private RadioButton radioHost;
         private Label mediaLabel;
         private TextBox mediaBox;
-        private RadioButton radioStaff;
-        private RadioButton radioDay3;
-        private RadioButton radioDay2;
-        private RadioButton radioDay1;
         private Button clearButton;
         private Button execButton;
         private Label idLabel;

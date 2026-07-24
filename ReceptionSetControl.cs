@@ -21,13 +21,18 @@ namespace janog_reception_ui
         private System.Media.SoundPlayer? _speakersVoicePlayer;
         private Func<string, bool>? _tryHandleConfigQr;
         private Func<bool>? _isSettingsOpen;
-        private string _currentImage = "day1.png";
+        private LabelState? _currentLabelState;
         private int _isReceptionProcessing;
         private bool _heartbeatInProgress;
         private DateTimeOffset? _lastTransmissionAt;
         private bool _shutDown;
 
         private sealed record PrintStatusResult(int EventCode, int ErrorCode, string ErrorString);
+        private sealed record LabelState(
+            string ImageFilename,
+            string Program,
+            string FullName,
+            string Organization);
 
         public ReceptionSetControl()
         {
@@ -62,8 +67,7 @@ namespace janog_reception_ui
             }
             else
             {
-                SetDayImage(_currentImage);
-                UpdatePreview();
+                printButton.Enabled = false;
             }
 
             _serialPort = new SerialPort { BaudRate = 115200 };
@@ -266,7 +270,10 @@ namespace janog_reception_ui
             _labelDocument = new Document();
             if (!_labelDocument.Open(Path.Combine(exeDirPath, "label.lbx")))
                 throw new Exception("Load label template error");
-            SetDayImage(_currentImage);
+            if (_currentLabelState != null)
+            {
+                ApplyLabelState(_currentLabelState);
+            }
         }
 
         private async Task PrintLabelAsync()
@@ -307,6 +314,33 @@ namespace janog_reception_ui
         private void SetDayImage(string filename)
         {
             LabelDocument.GetObject("day_image").SetData(0, filename, 0);
+        }
+
+        private void ApplyLabelState(LabelState state)
+        {
+            SetDayImage(state.ImageFilename);
+            SetLabelField("program", state.Program);
+            SetLabelField("full_name", state.FullName);
+            SetLabelField("organization", state.Organization);
+        }
+
+        private static string GetLabelImageFilename(string labelType)
+        {
+            if (string.IsNullOrWhiteSpace(labelType))
+            {
+                throw new InvalidOperationException("APIレスポンスにlabel_typeがありません");
+            }
+
+            return labelType switch
+            {
+                "staff" => "staff.png",
+                "host" => "host.png",
+                "day1" => "day1.png",
+                "day2" => "day2.png",
+                "day3" => "day3.png",
+                "test" => "test.png",
+                _ => throw new InvalidOperationException($"未対応のlabel_typeです: {labelType}"),
+            };
         }
 
         private bool TryStartReception()
@@ -370,13 +404,15 @@ namespace janog_reception_ui
 
             try
             {
-                if (participant.Type == "staff") SetDayImage("staff.png");
-                else if (participant.Type == "host") SetDayImage("host.png");
-
-                SetLabelField("program", participant.Program);
-                SetLabelField("full_name", participant.FullName);
-                SetLabelField("organization", participant.Organization);
+                var labelState = new LabelState(
+                    GetLabelImageFilename(participant.LabelType),
+                    participant.Program,
+                    participant.FullName,
+                    participant.Organization);
+                ApplyLabelState(labelState);
                 UpdatePreview();
+                _currentLabelState = labelState;
+                printButton.Enabled = true;
 
                 if (participant.Type == "speaker" && participant.AcceptCount == 1)
                 {
@@ -391,11 +427,6 @@ namespace janog_reception_ui
                 System.Media.SystemSounds.Beep.Play();
                 SetError(ex.Message);
                 await ReportTerminalStatusSafelyAsync(client, "error", "印刷エラー", ex.Message);
-            }
-            finally
-            {
-                try { SetDayImage(_currentImage); }
-                catch (Exception ex) { Debug.WriteLine($"Failed to restore label image: {ex.Message}"); }
             }
         }
 
@@ -423,6 +454,7 @@ namespace janog_reception_ui
 
         private async void printButton_Click(object sender, EventArgs e)
         {
+            if (_currentLabelState == null) return;
             if (!TryStartReception()) return;
             try
             {
@@ -444,20 +476,6 @@ namespace janog_reception_ui
             {
                 FinishReception();
             }
-        }
-
-        private void radioDay1_CheckedChanged(object sender, EventArgs e) => SetSelectedImage(radioDay1, "day1.png");
-        private void radioDay2_CheckedChanged(object sender, EventArgs e) => SetSelectedImage(radioDay2, "day2.png");
-        private void radioDay3_CheckedChanged(object sender, EventArgs e) => SetSelectedImage(radioDay3, "day3.png");
-        private void radioStaff_CheckedChanged(object sender, EventArgs e) => SetSelectedImage(radioStaff, "staff.png");
-        private void radioHost_CheckedChanged(object sender, EventArgs e) => SetSelectedImage(radioHost, "host.png");
-
-        private void SetSelectedImage(RadioButton radioButton, string filename)
-        {
-            if (!radioButton.Checked || _labelDocument == null) return;
-            _currentImage = filename;
-            SetDayImage(filename);
-            UpdatePreview();
         }
 
         internal static string TryExtractUlid(string input)

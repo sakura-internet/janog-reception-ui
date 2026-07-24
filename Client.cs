@@ -22,6 +22,9 @@ namespace janog_reception_ui
         [JsonPropertyName("type")]
         public required string Type { get; set; }
 
+        [JsonPropertyName("label_type")]
+        public required string LabelType { get; set; }
+
         [JsonPropertyName("program")]
         public required string Program { get; set; }
 
