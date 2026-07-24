@@ -1,363 +1,465 @@
-﻿namespace janog_reception_ui
+namespace janog_reception_ui
 {
     partial class EnvConfigForm
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing)
             {
-                components.Dispose();
+                components?.Dispose();
             }
             base.Dispose(disposing);
         }
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
-            groupBox1 = new GroupBox();
+            receptionSetsGroupBox = new GroupBox();
+            setEditorGroupBox = new GroupBox();
+            readerComboBox = new ComboBox();
+            readerLabel = new Label();
+            printerComboBox = new ComboBox();
+            printerLabel = new Label();
+            textBoxGate = new TextBox();
+            gateLabel = new Label();
+            moveDownButton = new Button();
+            moveUpButton = new Button();
+            deleteSetButton = new Button();
+            addSetButton = new Button();
+            setListBox = new ListBox();
+            environmentChoiceGroupBox = new GroupBox();
             radioEnvProduction = new RadioButton();
             radioEnvDevelop = new RadioButton();
-            groupBox2 = new GroupBox();
+            developGroupBox = new GroupBox();
             textBoxDevUsername = new TextBox();
-            label3 = new Label();
+            devPasswordLabel = new Label();
             textBoxDevPassword = new TextBox();
-            label2 = new Label();
+            devUsernameLabel = new Label();
             textBoxDevBaseUrl = new TextBox();
-            label1 = new Label();
-            groupBox3 = new GroupBox();
+            devUrlLabel = new Label();
+            productionGroupBox = new GroupBox();
             textBoxProdPassword = new TextBox();
             textBoxProdUsername = new TextBox();
-            label4 = new Label();
-            label5 = new Label();
+            prodPasswordLabel = new Label();
+            prodUsernameLabel = new Label();
             textBoxProdBaseUrl = new TextBox();
-            label6 = new Label();
-            groupBox4 = new GroupBox();
-            label8 = new Label();
-            printerComboBox = new ComboBox();
-            textBoxGate = new TextBox();
-            label7 = new Label();
-            label9 = new Label();
-            readerComboBox = new ComboBox();
-            groupBox1.SuspendLayout();
-            groupBox2.SuspendLayout();
-            groupBox3.SuspendLayout();
-            groupBox4.SuspendLayout();
+            prodUrlLabel = new Label();
+            audioGroupBox = new GroupBox();
+            playSoundButton = new Button();
+            audioEnabledCheckBox = new CheckBox();
+            receptionSetsGroupBox.SuspendLayout();
+            setEditorGroupBox.SuspendLayout();
+            environmentChoiceGroupBox.SuspendLayout();
+            developGroupBox.SuspendLayout();
+            productionGroupBox.SuspendLayout();
+            audioGroupBox.SuspendLayout();
             SuspendLayout();
-            // 
-            // groupBox1
-            // 
-            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            groupBox1.Controls.Add(radioEnvProduction);
-            groupBox1.Controls.Add(radioEnvDevelop);
-            groupBox1.Location = new Point(12, 179);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(536, 53);
-            groupBox1.TabIndex = 0;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "利用する環境";
-            groupBox1.Enter += groupBox1_Enter;
-            // 
+            //
+            // receptionSetsGroupBox
+            //
+            receptionSetsGroupBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            receptionSetsGroupBox.Controls.Add(setEditorGroupBox);
+            receptionSetsGroupBox.Controls.Add(moveDownButton);
+            receptionSetsGroupBox.Controls.Add(moveUpButton);
+            receptionSetsGroupBox.Controls.Add(deleteSetButton);
+            receptionSetsGroupBox.Controls.Add(addSetButton);
+            receptionSetsGroupBox.Controls.Add(setListBox);
+            receptionSetsGroupBox.Location = new Point(16, 15);
+            receptionSetsGroupBox.Name = "receptionSetsGroupBox";
+            receptionSetsGroupBox.Size = new Size(948, 275);
+            receptionSetsGroupBox.TabIndex = 0;
+            receptionSetsGroupBox.TabStop = false;
+            receptionSetsGroupBox.Text = "受付セット";
+            //
+            // setEditorGroupBox
+            //
+            setEditorGroupBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            setEditorGroupBox.Controls.Add(readerComboBox);
+            setEditorGroupBox.Controls.Add(readerLabel);
+            setEditorGroupBox.Controls.Add(printerComboBox);
+            setEditorGroupBox.Controls.Add(printerLabel);
+            setEditorGroupBox.Controls.Add(textBoxGate);
+            setEditorGroupBox.Controls.Add(gateLabel);
+            setEditorGroupBox.Location = new Point(303, 30);
+            setEditorGroupBox.Name = "setEditorGroupBox";
+            setEditorGroupBox.Size = new Size(630, 226);
+            setEditorGroupBox.TabIndex = 5;
+            setEditorGroupBox.TabStop = false;
+            setEditorGroupBox.Text = "選択中のセット";
+            //
+            // readerComboBox
+            //
+            readerComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            readerComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            readerComboBox.FormattingEnabled = true;
+            readerComboBox.Location = new Point(108, 155);
+            readerComboBox.Name = "readerComboBox";
+            readerComboBox.Size = new Size(504, 33);
+            readerComboBox.TabIndex = 5;
+            //
+            // readerLabel
+            //
+            readerLabel.AutoSize = true;
+            readerLabel.Location = new Point(23, 160);
+            readerLabel.Name = "readerLabel";
+            readerLabel.Size = new Size(78, 25);
+            readerLabel.TabIndex = 4;
+            readerLabel.Text = "QRリーダ";
+            //
+            // printerComboBox
+            //
+            printerComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            printerComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            printerComboBox.FormattingEnabled = true;
+            printerComboBox.Location = new Point(108, 101);
+            printerComboBox.Name = "printerComboBox";
+            printerComboBox.Size = new Size(504, 33);
+            printerComboBox.TabIndex = 3;
+            //
+            // printerLabel
+            //
+            printerLabel.AutoSize = true;
+            printerLabel.Location = new Point(36, 106);
+            printerLabel.Name = "printerLabel";
+            printerLabel.Size = new Size(65, 25);
+            printerLabel.TabIndex = 2;
+            printerLabel.Text = "プリンタ";
+            //
+            // textBoxGate
+            //
+            textBoxGate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textBoxGate.Location = new Point(108, 48);
+            textBoxGate.Name = "textBoxGate";
+            textBoxGate.Size = new Size(504, 31);
+            textBoxGate.TabIndex = 1;
+            //
+            // gateLabel
+            //
+            gateLabel.AutoSize = true;
+            gateLabel.Location = new Point(51, 53);
+            gateLabel.Name = "gateLabel";
+            gateLabel.Size = new Size(50, 25);
+            gateLabel.TabIndex = 0;
+            gateLabel.Text = "ゲート";
+            //
+            // moveDownButton
+            //
+            moveDownButton.Location = new Point(218, 215);
+            moveDownButton.Name = "moveDownButton";
+            moveDownButton.Size = new Size(68, 41);
+            moveDownButton.TabIndex = 4;
+            moveDownButton.Text = "下へ";
+            moveDownButton.UseVisualStyleBackColor = true;
+            moveDownButton.Click += moveDownButton_Click;
+            //
+            // moveUpButton
+            //
+            moveUpButton.Location = new Point(144, 215);
+            moveUpButton.Name = "moveUpButton";
+            moveUpButton.Size = new Size(68, 41);
+            moveUpButton.TabIndex = 3;
+            moveUpButton.Text = "上へ";
+            moveUpButton.UseVisualStyleBackColor = true;
+            moveUpButton.Click += moveUpButton_Click;
+            //
+            // deleteSetButton
+            //
+            deleteSetButton.Location = new Point(78, 215);
+            deleteSetButton.Name = "deleteSetButton";
+            deleteSetButton.Size = new Size(60, 41);
+            deleteSetButton.TabIndex = 2;
+            deleteSetButton.Text = "削除";
+            deleteSetButton.UseVisualStyleBackColor = true;
+            deleteSetButton.Click += deleteSetButton_Click;
+            //
+            // addSetButton
+            //
+            addSetButton.Location = new Point(12, 215);
+            addSetButton.Name = "addSetButton";
+            addSetButton.Size = new Size(60, 41);
+            addSetButton.TabIndex = 1;
+            addSetButton.Text = "追加";
+            addSetButton.UseVisualStyleBackColor = true;
+            addSetButton.Click += addSetButton_Click;
+            //
+            // setListBox
+            //
+            setListBox.FormattingEnabled = true;
+            setListBox.ItemHeight = 25;
+            setListBox.Location = new Point(12, 35);
+            setListBox.Name = "setListBox";
+            setListBox.Size = new Size(274, 154);
+            setListBox.TabIndex = 0;
+            setListBox.SelectedIndexChanged += setListBox_SelectedIndexChanged;
+            //
+            // environmentChoiceGroupBox
+            //
+            environmentChoiceGroupBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            environmentChoiceGroupBox.Controls.Add(radioEnvProduction);
+            environmentChoiceGroupBox.Controls.Add(radioEnvDevelop);
+            environmentChoiceGroupBox.Location = new Point(16, 299);
+            environmentChoiceGroupBox.Name = "environmentChoiceGroupBox";
+            environmentChoiceGroupBox.Size = new Size(948, 73);
+            environmentChoiceGroupBox.TabIndex = 1;
+            environmentChoiceGroupBox.TabStop = false;
+            environmentChoiceGroupBox.Text = "利用する環境";
+            //
             // radioEnvProduction
-            // 
+            //
             radioEnvProduction.AutoSize = true;
-            radioEnvProduction.Location = new Point(85, 22);
+            radioEnvProduction.Location = new Point(132, 30);
             radioEnvProduction.Name = "radioEnvProduction";
-            radioEnvProduction.Size = new Size(73, 19);
+            radioEnvProduction.Size = new Size(109, 29);
             radioEnvProduction.TabIndex = 1;
-            radioEnvProduction.TabStop = true;
             radioEnvProduction.Text = "本番環境";
             radioEnvProduction.UseVisualStyleBackColor = true;
-            // 
+            //
             // radioEnvDevelop
-            // 
+            //
             radioEnvDevelop.AutoSize = true;
-            radioEnvDevelop.Location = new Point(6, 22);
+            radioEnvDevelop.Location = new Point(17, 30);
             radioEnvDevelop.Name = "radioEnvDevelop";
-            radioEnvDevelop.Size = new Size(73, 19);
-            radioEnvDevelop.TabIndex = 1;
-            radioEnvDevelop.TabStop = true;
+            radioEnvDevelop.Size = new Size(109, 29);
+            radioEnvDevelop.TabIndex = 0;
             radioEnvDevelop.Text = "開発環境";
             radioEnvDevelop.UseVisualStyleBackColor = true;
-            // 
-            // groupBox2
-            // 
-            groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            groupBox2.Controls.Add(textBoxDevUsername);
-            groupBox2.Controls.Add(label3);
-            groupBox2.Controls.Add(textBoxDevPassword);
-            groupBox2.Controls.Add(label2);
-            groupBox2.Controls.Add(textBoxDevBaseUrl);
-            groupBox2.Controls.Add(label1);
-            groupBox2.Location = new Point(12, 238);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(536, 117);
-            groupBox2.TabIndex = 1;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "開発環境";
-            // 
+            //
+            // developGroupBox
+            //
+            developGroupBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            developGroupBox.Controls.Add(textBoxDevUsername);
+            developGroupBox.Controls.Add(devPasswordLabel);
+            developGroupBox.Controls.Add(textBoxDevPassword);
+            developGroupBox.Controls.Add(devUsernameLabel);
+            developGroupBox.Controls.Add(textBoxDevBaseUrl);
+            developGroupBox.Controls.Add(devUrlLabel);
+            developGroupBox.Location = new Point(16, 381);
+            developGroupBox.Name = "developGroupBox";
+            developGroupBox.Size = new Size(948, 174);
+            developGroupBox.TabIndex = 2;
+            developGroupBox.TabStop = false;
+            developGroupBox.Text = "開発環境";
+            //
             // textBoxDevUsername
-            // 
+            //
             textBoxDevUsername.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textBoxDevUsername.Location = new Point(71, 51);
+            textBoxDevUsername.Location = new Point(112, 82);
             textBoxDevUsername.Name = "textBoxDevUsername";
-            textBoxDevUsername.Size = new Size(459, 23);
+            textBoxDevUsername.Size = new Size(817, 31);
             textBoxDevUsername.TabIndex = 3;
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(14, 83);
-            label3.Name = "label3";
-            label3.Size = new Size(51, 15);
-            label3.TabIndex = 6;
-            label3.Text = "パスワード";
-            label3.TextAlign = ContentAlignment.TopRight;
-            // 
+            //
+            // devPasswordLabel
+            //
+            devPasswordLabel.AutoSize = true;
+            devPasswordLabel.Location = new Point(24, 128);
+            devPasswordLabel.Name = "devPasswordLabel";
+            devPasswordLabel.Size = new Size(79, 25);
+            devPasswordLabel.TabIndex = 4;
+            devPasswordLabel.Text = "パスワード";
+            //
             // textBoxDevPassword
-            // 
+            //
             textBoxDevPassword.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textBoxDevPassword.Location = new Point(71, 80);
+            textBoxDevPassword.Location = new Point(112, 123);
             textBoxDevPassword.Name = "textBoxDevPassword";
             textBoxDevPassword.PasswordChar = '*';
-            textBoxDevPassword.Size = new Size(459, 23);
+            textBoxDevPassword.Size = new Size(817, 31);
             textBoxDevPassword.TabIndex = 5;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(10, 54);
-            label2.Name = "label2";
-            label2.Size = new Size(55, 15);
-            label2.TabIndex = 4;
-            label2.Text = "ユーザー名";
-            label2.TextAlign = ContentAlignment.TopRight;
-            // 
+            //
+            // devUsernameLabel
+            //
+            devUsernameLabel.AutoSize = true;
+            devUsernameLabel.Location = new Point(19, 87);
+            devUsernameLabel.Name = "devUsernameLabel";
+            devUsernameLabel.Size = new Size(84, 25);
+            devUsernameLabel.TabIndex = 2;
+            devUsernameLabel.Text = "ユーザー名";
+            //
             // textBoxDevBaseUrl
-            // 
+            //
             textBoxDevBaseUrl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textBoxDevBaseUrl.Location = new Point(71, 22);
+            textBoxDevBaseUrl.Location = new Point(112, 40);
             textBoxDevBaseUrl.Name = "textBoxDevBaseUrl";
-            textBoxDevBaseUrl.Size = new Size(459, 23);
-            textBoxDevBaseUrl.TabIndex = 2;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(9, 25);
-            label1.Name = "label1";
-            label1.Size = new Size(56, 15);
-            label1.TabIndex = 2;
-            label1.Text = "サーバURL";
-            label1.TextAlign = ContentAlignment.TopRight;
-            // 
-            // groupBox3
-            // 
-            groupBox3.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            groupBox3.Controls.Add(textBoxProdPassword);
-            groupBox3.Controls.Add(textBoxProdUsername);
-            groupBox3.Controls.Add(label4);
-            groupBox3.Controls.Add(label5);
-            groupBox3.Controls.Add(textBoxProdBaseUrl);
-            groupBox3.Controls.Add(label6);
-            groupBox3.Location = new Point(12, 361);
-            groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(536, 117);
-            groupBox3.TabIndex = 7;
-            groupBox3.TabStop = false;
-            groupBox3.Text = "本番環境";
-            // 
+            textBoxDevBaseUrl.Size = new Size(817, 31);
+            textBoxDevBaseUrl.TabIndex = 1;
+            //
+            // devUrlLabel
+            //
+            devUrlLabel.AutoSize = true;
+            devUrlLabel.Location = new Point(18, 45);
+            devUrlLabel.Name = "devUrlLabel";
+            devUrlLabel.Size = new Size(85, 25);
+            devUrlLabel.TabIndex = 0;
+            devUrlLabel.Text = "サーバURL";
+            //
+            // productionGroupBox
+            //
+            productionGroupBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            productionGroupBox.Controls.Add(textBoxProdPassword);
+            productionGroupBox.Controls.Add(textBoxProdUsername);
+            productionGroupBox.Controls.Add(prodPasswordLabel);
+            productionGroupBox.Controls.Add(prodUsernameLabel);
+            productionGroupBox.Controls.Add(textBoxProdBaseUrl);
+            productionGroupBox.Controls.Add(prodUrlLabel);
+            productionGroupBox.Location = new Point(16, 564);
+            productionGroupBox.Name = "productionGroupBox";
+            productionGroupBox.Size = new Size(948, 174);
+            productionGroupBox.TabIndex = 3;
+            productionGroupBox.TabStop = false;
+            productionGroupBox.Text = "本番環境";
+            //
             // textBoxProdPassword
-            // 
+            //
             textBoxProdPassword.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textBoxProdPassword.Location = new Point(71, 80);
+            textBoxProdPassword.Location = new Point(112, 123);
             textBoxProdPassword.Name = "textBoxProdPassword";
             textBoxProdPassword.PasswordChar = '*';
-            textBoxProdPassword.Size = new Size(459, 23);
-            textBoxProdPassword.TabIndex = 8;
-            // 
+            textBoxProdPassword.Size = new Size(817, 31);
+            textBoxProdPassword.TabIndex = 5;
+            //
             // textBoxProdUsername
-            // 
+            //
             textBoxProdUsername.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textBoxProdUsername.Location = new Point(71, 51);
+            textBoxProdUsername.Location = new Point(112, 82);
             textBoxProdUsername.Name = "textBoxProdUsername";
-            textBoxProdUsername.Size = new Size(459, 23);
+            textBoxProdUsername.Size = new Size(817, 31);
             textBoxProdUsername.TabIndex = 3;
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Location = new Point(14, 83);
-            label4.Name = "label4";
-            label4.Size = new Size(51, 15);
-            label4.TabIndex = 6;
-            label4.Text = "パスワード";
-            label4.TextAlign = ContentAlignment.TopRight;
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Location = new Point(10, 54);
-            label5.Name = "label5";
-            label5.Size = new Size(55, 15);
-            label5.TabIndex = 4;
-            label5.Text = "ユーザー名";
-            label5.TextAlign = ContentAlignment.TopRight;
-            // 
+            //
+            // prodPasswordLabel
+            //
+            prodPasswordLabel.AutoSize = true;
+            prodPasswordLabel.Location = new Point(24, 128);
+            prodPasswordLabel.Name = "prodPasswordLabel";
+            prodPasswordLabel.Size = new Size(79, 25);
+            prodPasswordLabel.TabIndex = 4;
+            prodPasswordLabel.Text = "パスワード";
+            //
+            // prodUsernameLabel
+            //
+            prodUsernameLabel.AutoSize = true;
+            prodUsernameLabel.Location = new Point(19, 87);
+            prodUsernameLabel.Name = "prodUsernameLabel";
+            prodUsernameLabel.Size = new Size(84, 25);
+            prodUsernameLabel.TabIndex = 2;
+            prodUsernameLabel.Text = "ユーザー名";
+            //
             // textBoxProdBaseUrl
-            // 
+            //
             textBoxProdBaseUrl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textBoxProdBaseUrl.Location = new Point(71, 22);
+            textBoxProdBaseUrl.Location = new Point(112, 40);
             textBoxProdBaseUrl.Name = "textBoxProdBaseUrl";
-            textBoxProdBaseUrl.Size = new Size(459, 23);
-            textBoxProdBaseUrl.TabIndex = 2;
-            // 
-            // label6
-            // 
-            label6.AutoSize = true;
-            label6.Location = new Point(9, 25);
-            label6.Name = "label6";
-            label6.Size = new Size(56, 15);
-            label6.TabIndex = 2;
-            label6.Text = "サーバURL";
-            label6.TextAlign = ContentAlignment.TopRight;
-            // 
-            // groupBox4
-            // 
-            groupBox4.Controls.Add(readerComboBox);
-            groupBox4.Controls.Add(label9);
-            groupBox4.Controls.Add(label8);
-            groupBox4.Controls.Add(printerComboBox);
-            groupBox4.Controls.Add(textBoxGate);
-            groupBox4.Controls.Add(label7);
-            groupBox4.Location = new Point(12, 12);
-            groupBox4.Name = "groupBox4";
-            groupBox4.Size = new Size(536, 137);
-            groupBox4.TabIndex = 8;
-            groupBox4.TabStop = false;
-            groupBox4.Text = "基本設定";
-            // 
-            // label8
-            // 
-            label8.AutoSize = true;
-            label8.Location = new Point(23, 51);
-            label8.Name = "label8";
-            label8.Size = new Size(42, 15);
-            label8.TabIndex = 6;
-            label8.Text = "プリンタ";
-            label8.TextAlign = ContentAlignment.TopRight;
-            // 
-            // printerComboBox
-            // 
-            printerComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            printerComboBox.FormattingEnabled = true;
-            printerComboBox.Location = new Point(71, 48);
-            printerComboBox.Name = "printerComboBox";
-            printerComboBox.Size = new Size(459, 23);
-            printerComboBox.TabIndex = 5;
-            // 
-            // textBoxGate
-            // 
-            textBoxGate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textBoxGate.Location = new Point(71, 19);
-            textBoxGate.Name = "textBoxGate";
-            textBoxGate.Size = new Size(108, 23);
-            textBoxGate.TabIndex = 3;
-            // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.Location = new Point(32, 22);
-            label7.Name = "label7";
-            label7.Size = new Size(33, 15);
-            label7.TabIndex = 4;
-            label7.Text = "ゲート";
-            label7.TextAlign = ContentAlignment.TopRight;
-            // 
-            // label9
-            // 
-            label9.AutoSize = true;
-            label9.Location = new Point(25, 80);
-            label9.Name = "label9";
-            label9.Size = new Size(40, 15);
-            label9.TabIndex = 7;
-            label9.Text = "リーダー";
-            label9.TextAlign = ContentAlignment.TopRight;
-            label9.Click += label9_Click;
-            // 
-            // readerComboBox
-            // 
-            readerComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            readerComboBox.FormattingEnabled = true;
-            readerComboBox.Location = new Point(71, 77);
-            readerComboBox.Name = "readerComboBox";
-            readerComboBox.Size = new Size(459, 23);
-            readerComboBox.TabIndex = 8;
-            // 
+            textBoxProdBaseUrl.Size = new Size(817, 31);
+            textBoxProdBaseUrl.TabIndex = 1;
+            //
+            // prodUrlLabel
+            //
+            prodUrlLabel.AutoSize = true;
+            prodUrlLabel.Location = new Point(18, 45);
+            prodUrlLabel.Name = "prodUrlLabel";
+            prodUrlLabel.Size = new Size(85, 25);
+            prodUrlLabel.TabIndex = 0;
+            prodUrlLabel.Text = "サーバURL";
+            //
+            // audioGroupBox
+            //
+            audioGroupBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            audioGroupBox.Controls.Add(playSoundButton);
+            audioGroupBox.Controls.Add(audioEnabledCheckBox);
+            audioGroupBox.Location = new Point(16, 747);
+            audioGroupBox.Name = "audioGroupBox";
+            audioGroupBox.Size = new Size(948, 78);
+            audioGroupBox.TabIndex = 4;
+            audioGroupBox.TabStop = false;
+            audioGroupBox.Text = "音声";
+            //
+            // playSoundButton
+            //
+            playSoundButton.Location = new Point(142, 29);
+            playSoundButton.Name = "playSoundButton";
+            playSoundButton.Size = new Size(112, 34);
+            playSoundButton.TabIndex = 1;
+            playSoundButton.Text = "テスト再生";
+            playSoundButton.UseVisualStyleBackColor = true;
+            playSoundButton.Click += playSoundButton_Click;
+            //
+            // audioEnabledCheckBox
+            //
+            audioEnabledCheckBox.AutoSize = true;
+            audioEnabledCheckBox.Location = new Point(17, 32);
+            audioEnabledCheckBox.Name = "audioEnabledCheckBox";
+            audioEnabledCheckBox.Size = new Size(110, 29);
+            audioEnabledCheckBox.TabIndex = 0;
+            audioEnabledCheckBox.Text = "音声再生";
+            audioEnabledCheckBox.UseVisualStyleBackColor = true;
+            //
             // EnvConfigForm
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            //
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(560, 497);
-            Controls.Add(groupBox4);
-            Controls.Add(groupBox3);
-            Controls.Add(groupBox2);
-            Controls.Add(groupBox1);
-            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            AutoScroll = true;
+            ClientSize = new Size(980, 842);
+            Controls.Add(audioGroupBox);
+            Controls.Add(productionGroupBox);
+            Controls.Add(developGroupBox);
+            Controls.Add(environmentChoiceGroupBox);
+            Controls.Add(receptionSetsGroupBox);
+            FormBorderStyle = FormBorderStyle.SizableToolWindow;
+            MinimumSize = new Size(800, 700);
             Name = "EnvConfigForm";
             Text = "環境設定";
             FormClosing += EnvConfigForm_FormClosing;
             Load += EnvConfigForm_Load;
-            Shown += EnvConfigForm_Shown;
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
-            groupBox2.ResumeLayout(false);
-            groupBox2.PerformLayout();
-            groupBox3.ResumeLayout(false);
-            groupBox3.PerformLayout();
-            groupBox4.ResumeLayout(false);
-            groupBox4.PerformLayout();
+            receptionSetsGroupBox.ResumeLayout(false);
+            setEditorGroupBox.ResumeLayout(false);
+            setEditorGroupBox.PerformLayout();
+            environmentChoiceGroupBox.ResumeLayout(false);
+            environmentChoiceGroupBox.PerformLayout();
+            developGroupBox.ResumeLayout(false);
+            developGroupBox.PerformLayout();
+            productionGroupBox.ResumeLayout(false);
+            productionGroupBox.PerformLayout();
+            audioGroupBox.ResumeLayout(false);
+            audioGroupBox.PerformLayout();
             ResumeLayout(false);
         }
 
         #endregion
 
-        private GroupBox groupBox1;
-        private RadioButton radioEnvDevelop;
-        private RadioButton radioEnvProduction;
-        private GroupBox groupBox2;
-        private Label label1;
-        private TextBox textBoxDevBaseUrl;
-        private TextBox textBoxDevUsername;
-        private Label label3;
-        private Label label2;
-        private TextBox textBoxDevPassword;
-        private GroupBox groupBox3;
-        private TextBox textBoxProdUsername;
-        private Label label4;
-        private Label label5;
-        private TextBox textBoxProdBaseUrl;
-        private Label label6;
-        private TextBox textBoxProdPassword;
-        private GroupBox groupBox4;
-        private TextBox textBoxGate;
-        private Label label7;
-        private Label label8;
-        private ComboBox printerComboBox;
-        private Label label9;
+        private GroupBox receptionSetsGroupBox;
+        private GroupBox setEditorGroupBox;
         private ComboBox readerComboBox;
+        private Label readerLabel;
+        private ComboBox printerComboBox;
+        private Label printerLabel;
+        private TextBox textBoxGate;
+        private Label gateLabel;
+        private Button moveDownButton;
+        private Button moveUpButton;
+        private Button deleteSetButton;
+        private Button addSetButton;
+        private ListBox setListBox;
+        private GroupBox environmentChoiceGroupBox;
+        private RadioButton radioEnvProduction;
+        private RadioButton radioEnvDevelop;
+        private GroupBox developGroupBox;
+        private TextBox textBoxDevUsername;
+        private Label devPasswordLabel;
+        private TextBox textBoxDevPassword;
+        private Label devUsernameLabel;
+        private TextBox textBoxDevBaseUrl;
+        private Label devUrlLabel;
+        private GroupBox productionGroupBox;
+        private TextBox textBoxProdPassword;
+        private TextBox textBoxProdUsername;
+        private Label prodPasswordLabel;
+        private Label prodUsernameLabel;
+        private TextBox textBoxProdBaseUrl;
+        private Label prodUrlLabel;
+        private GroupBox audioGroupBox;
+        private Button playSoundButton;
+        private CheckBox audioEnabledCheckBox;
     }
 }

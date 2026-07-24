@@ -37,12 +37,45 @@
     <None Update="day3.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="host.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="label.lbx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="label-speakers.lbx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="staff.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="test.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="voice-speakers.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ReceptionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ReceptionForm.Designer.cs">
+      <DependentUpon>ReceptionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Update="EnvConfigForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="EnvConfigForm.Designer.cs">
+      <DependentUpon>EnvConfigForm.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ReceptionSetControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="ReceptionSetControl.Designer.cs">
+      <DependentUpon>ReceptionSetControl.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

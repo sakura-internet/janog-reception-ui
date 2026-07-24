@@ -1,287 +1,161 @@
-using bpac;
-using Microsoft.VisualBasic.Logging;
-using System.IO.Ports;
-using System.Net.WebSockets;
-using System.Security.Policy;
-using System.Text;
-using System.Text.RegularExpressions;
-
 namespace janog_reception_ui
 {
     public partial class ReceptionForm : Form
     {
-
-        bpac.Document labelDocument;
+        private readonly List<ReceptionSetControl> _setControls = new();
         private Config _config;
-        private SerialPort? _serialPort;
-        private string _currentImage = "day1.png";
+        private EnvConfigForm? _activeEnvConfigForm;
 
         public ReceptionForm()
         {
             InitializeComponent();
-
-            _serialPort = new SerialPort();
-            _serialPort.BaudRate = 115200;
-            _serialPort.DataReceived += SerialPort_DataReceived;
-
-            errorLabel.Text = "";
-
-            // Load Label Template
-            string? exeDirPath = Path.GetDirectoryName(Application.ExecutablePath);
-            labelDocument = new bpac.Document();
-            if (!labelDocument.Open((exeDirPath ?? string.Empty) + "\\" + "label.lbx"))
+            if (System.ComponentModel.LicenseManager.UsageMode ==
+                System.ComponentModel.LicenseUsageMode.Designtime)
             {
-                MessageBox.Show("Load label template error");
+                _config = new Config();
+                return;
             }
             _config = Config.LoadYAML();
-            SetConfig(_config);
+            ApplyConfig();
+            statusAgeTimer.Start();
         }
 
-        private void ReceptionForm_Load(object sender, EventArgs e)
+        public static string TryExtractUlid(string input)
         {
-            UpdatePreview();
+            return ReceptionSetControl.TryExtractUlid(input);
         }
 
-        private void SetConfig(Config cfg)
+        private void ApplyConfig()
         {
-            if (cfg.Environment.Environment != EnvironmentKind.Production)
+            UpdateEnvironmentStatus();
+            RebuildReceptionSets();
+        }
+
+        private void UpdateEnvironmentStatus()
+        {
+            if (_config.Environment.Environment == EnvironmentKind.Production)
             {
-                toolStripEnvLabel.Text = "äJî≠ä¬ã´";
-                toolStripEnvLabel.BackColor = Color.Red;
+                toolStripEnvLabel.Text = "Êú¨Áï™Áí∞Â¢É";
+                toolStripEnvLabel.BackColor = Color.DodgerBlue;
             }
             else
             {
-                toolStripEnvLabel.Text = "ñ{î‘ä¬ã´";
-                toolStripEnvLabel.BackColor = Color.DodgerBlue;
-            }
-            gateLabel.Text = cfg.Gate;
-            printerLabel.Text = cfg.Printer;
-            readerLabel.Text = cfg.Reader.Port;
-
-            if (cfg.Reader.Port != "" && _serialPort != null)
-            {
-                timer1.Enabled = true;
-                _serialPort.Close();
-                _serialPort.PortName = cfg.Reader.Port;
-                try
-                {
-                    _serialPort.Open();
-                    readerLabel.Text = cfg.Reader.Port + " (ê⁄ë±çœÇ›)";
-                }
-                catch (Exception ex)
-                {
-                    readerLabel.Text = cfg.Reader.Port + " (ÉGÉâÅ[)";
-                    MessageBox.Show("ÉVÉäÉAÉãÉ|Å[ÉgÇÃÉIÅ[ÉvÉìÇ…é∏îsÇµÇ‹ÇµÇΩ: " + ex.Message, "ÉGÉâÅ[", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-
+                toolStripEnvLabel.Text = "ÈñãÁô∫Áí∞Â¢É";
+                toolStripEnvLabel.BackColor = Color.Red;
             }
         }
 
-        private void UpdatePreview()
+        private void RebuildReceptionSets()
         {
-            string filename = Path.GetTempFileName();
-            labelDocument.Export(ExportType.bexBmp, filename, 72 * 4);
-
-            Image img;
-            using (var tmp = Image.FromFile(filename))
-            {
-                img = (Image)tmp.Clone();  // ÉÅÉÇÉäè„Ç…ÉRÉsÅ[
-                tmp.Dispose();
-            }
-
-            previewBox.Image = img;
-        }
-
-        private void PrintLabel()
-        {
-            labelDocument.SetPrinter(_config.Printer, false);
-            labelDocument.StartPrint("", PrintOptionConstants.bpoAutoCut);
-            labelDocument.PrintOut(1, PrintOptionConstants.bpoAutoCut);
-            labelDocument.EndPrint();
-        }
-
-        private void SetLabelField(string fieldName, string value)
-        {
-            labelDocument.GetObject(fieldName).Text = value;
-        }
-
-        private void SetDayImage(string filename)
-        {
-            labelDocument.GetObject("day_image").SetData(0, filename, 0);
-        }
-
-        private void idBox_TextChanged(object sender, EventArgs e)
-        {
-            // check ULID format by regex
-            var regex = new System.Text.RegularExpressions.Regex("^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$");
-            execButton.Enabled = regex.IsMatch(idBox.Text);
-        }
-
-        private void execButton_Click(object sender, EventArgs e)
-        {
-            execute();
-        }
-
-        private void execute()
-        {
-
-            errorLabel.Text = "";
-            var auth = _config.Auth();
-            Client client = new Client(auth.BaseUrl, auth.Username, auth.Password);
-            Participant? participant;
+            receptionFlowPanel.SuspendLayout();
             try
             {
-                var response = client.AcceptParticipant(idBox.Text, _config.Gate, mediaBox.Text);
-                participant = response.Participant;
+                foreach (var control in _setControls)
+                {
+                    control.Shutdown();
+                    receptionFlowPanel.Controls.Remove(control);
+                    control.Dispose();
+                }
+                _setControls.Clear();
+
+                _config.Normalize();
+                foreach (var setConfig in _config.ReceptionSets)
+                {
+                    var control = new ReceptionSetControl();
+                    control.Initialize(
+                        _config,
+                        setConfig,
+                        TryRouteConfigQr,
+                        () => _activeEnvConfigForm != null);
+                    _setControls.Add(control);
+                    receptionFlowPanel.Controls.Add(control);
+                }
+                ResizeSetControls();
             }
-            catch (Exception ex)
+            finally
             {
-                System.Media.SystemSounds.Beep.Play();
-                errorLabel.Text = ex.Message;
-                return;
+                receptionFlowPanel.ResumeLayout(true);
             }
+        }
 
-            if (participant.Type == "staff" || participant.Type == "host")
+        private bool TryRouteConfigQr(string rawValue)
+        {
+            var configForm = _activeEnvConfigForm;
+            if (configForm == null || configForm.IsDisposed) return false;
+
+            try
             {
-                SetDayImage("staff.png");
+                BeginInvoke(new Action(() =>
+                {
+                    if (ReferenceEquals(_activeEnvConfigForm, configForm) && !configForm.IsDisposed)
+                    {
+                        configForm.HandleQrScan(rawValue);
+                    }
+                }));
+                return true;
             }
-
-            SetLabelField("program", participant.Program);
-            SetLabelField("full_name", participant.FullName);
-            SetLabelField("organization", participant.Organization);
-            UpdatePreview();
-            PrintLabel();
-            SetDayImage(_currentImage);
+            catch (ObjectDisposedException)
+            {
+                return false;
+            }
+            catch (InvalidOperationException)
+            {
+                return false;
+            }
         }
 
-        private void radioDay1_CheckedChanged(object sender, EventArgs e)
+        private void ResizeSetControls()
         {
-            _currentImage = "day1.png";
-            SetDayImage(_currentImage);
-            UpdatePreview();
+            var width = Math.Max(
+                1000,
+                receptionFlowPanel.ClientSize.Width - SystemInformation.VerticalScrollBarWidth - 8);
+            foreach (var control in _setControls)
+            {
+                control.Width = width;
+            }
         }
 
-        private void radioDay2_CheckedChanged(object sender, EventArgs e)
+        private void receptionFlowPanel_Resize(object sender, EventArgs e)
         {
-            _currentImage = "day2.png";
-            SetDayImage(_currentImage);
-            UpdatePreview();
+            ResizeSetControls();
         }
 
-        private void radioDay3_CheckedChanged(object sender, EventArgs e)
+        private void statusAgeTimer_Tick(object sender, EventArgs e)
         {
-            _currentImage = "day3.png";
-            SetDayImage(_currentImage);
-            UpdatePreview();
-        }
-
-        private void radioStaff_CheckedChanged(object sender, EventArgs e)
-        {
-            _currentImage = "staff.png";
-            SetDayImage(_currentImage);
-            UpdatePreview();
+            foreach (var control in _setControls)
+            {
+                control.RefreshLastTransmissionLabel();
+            }
         }
 
         private void ConfigToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
-            EnvConfigForm form = new EnvConfigForm();
-            form.config = _config;
-            form.ShowDialog();
-            form.config.SaveYAML();
-            SetConfig(_config);
-        }
-
-        private void toolStripStatusLabel1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void printButton_Click(object sender, EventArgs e)
-        {
-            PrintLabel();
-        }
-
-        StringBuilder buffer = new StringBuilder();
-        // ULID: Crockford Base32Ç≈26ï∂éöÅi0-9A-HJKMNP-TV-ZÅAI/L/O/UÇ»ÇµÅj
-        private static readonly Regex UlidAfterP =
-            new Regex(@"\?p=(?<ulid>[0-9A-HJKMNP-TV-Z]{26})(?:\b|$)",
-                      RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
-        public static string TryExtractUlid(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-                return "";
-
-            var m = UlidAfterP.Match(input);
-            if (!m.Success)
-                return "";
-
-            return m.Groups["ulid"].Value;
-        }
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            string data = _serialPort.ReadExisting();
-            Console.WriteLine(data);
-            buffer.Append(data);
-            while (true)
+            using var form = new EnvConfigForm { config = _config };
+            _activeEnvConfigForm = form;
+            try
             {
-                string current = buffer.ToString();
-                int index = current.IndexOf("\r");
-                if (index < 0) break;
-
-                string line = current.Substring(0, index).Trim();
-                buffer.Remove(0, index + 1);
-
-                if (line != "")
+                form.ShowDialog(this);
+            }
+            finally
+            {
+                if (ReferenceEquals(_activeEnvConfigForm, form))
                 {
-                    // "passbook?p=01KCJMZ8EF29PQ70ZY3RV42H19"
-                    Console.WriteLine(line);
-                    var ulid = TryExtractUlid(line);
-                    if (ulid != "")
-                    {
-
-                        int q = line.IndexOf('?');
-                        string beforeQuery = q >= 0 ? line.Substring(0, q) : line;
-
-                        // UIÉXÉåÉbÉhÇ…èàóùÇìnÇ∑
-                        BeginInvoke(new Action(() =>
-                        {
-                            if (idBox.Text != ulid)
-                            {
-                                idBox.Text = ulid;
-                                mediaBox.Text = beforeQuery;
-                                execute();
-                            }
-                        }));
-                    }
+                    _activeEnvConfigForm = null;
                 }
             }
+
+            _config.SaveYAML();
+            ApplyConfig();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            if (_serialPort != null && !_serialPort.IsOpen)
+            statusAgeTimer.Stop();
+            foreach (var control in _setControls)
             {
-                readerLabel.Text = _config.Reader.Port + " (êÿíf)";
-
-                if (_config.Reader.Port == "") return;
-                _serialPort.PortName = _config.Reader.Port;
-                try
-                {
-                    _serialPort.Open();
-                    readerLabel.Text = _config.Reader.Port + " (ê⁄ë±çœÇ›)";
-                }
-                catch (Exception ex)
-                {
-                    readerLabel.Text = _config.Reader.Port + " (ÉGÉâÅ[)";
-                }
+                control.Shutdown();
             }
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-            System.Media.SystemSounds.Beep.Play();
+            base.OnFormClosed(e);
         }
     }
 }
